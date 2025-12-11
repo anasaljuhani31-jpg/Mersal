@@ -19,11 +19,11 @@ function nav(page) {
         overlay.classList.remove('open');
     }
 
-    ['home', 'new', 'track'].forEach(p => document.getElementById(view-${p}).classList.add('hidden'));
-    document.getElementById(view-${page}).classList.remove('hidden');
+    ['home', 'new', 'track'].forEach(p => document.getElementById(`view-${p}`).classList.add('hidden'));
+    document.getElementById(`view-${page}`).classList.remove('hidden');
 
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(btn-${page}).classList.add('active');
+    document.getElementById(`btn-${page}`).classList.add('active');
 
     const titles = {'home': 'الرئيسية', 'new': 'إرسال طلب جديد', 'track': 'متابعة الطلبات'};
     document.getElementById('page-title').innerHTML = `
@@ -48,7 +48,7 @@ function toggleSidebar() {
 }
 
 function showError(stepId) {
-    const cards = document.querySelectorAll(#${stepId} .select-card);
+    const cards = document.querySelectorAll(`#${stepId} .select-card`);
     cards.forEach(card => {
         card.classList.add('border-red-500', 'ring-2', 'ring-red-200', 'bg-red-50/50');
         card.animate([
@@ -61,7 +61,7 @@ function showError(stepId) {
 }
 
 function clearError(stepId) {
-    const cards = document.querySelectorAll(#${stepId} .select-card);
+    const cards = document.querySelectorAll(`#${stepId} .select-card`);
     cards.forEach(card => {
         card.classList.remove('border-red-500', 'ring-2', 'ring-red-200', 'bg-red-50/50');
     });
@@ -186,8 +186,8 @@ function showEjarVerification() {
 }
 
 function simulateLoading(type) {
-    const loadingDiv = document.getElementById(${type}-loading);
-    const dataDiv = document.getElementById(${type}-data);
+    const loadingDiv = document.getElementById(`${type}-loading`);
+    const dataDiv = document.getElementById(`${type}-data`);
     const nextBtn = document.getElementById('btn-next');
 
     loadingDiv.classList.remove('hidden');
@@ -208,12 +208,12 @@ function simulateLoading(type) {
 function updateWizardUI() {
     hideAllSteps();
     if(typeof currentStep === 'number') {
-        document.getElementById(step-${currentStep}).classList.remove('hidden');
+        document.getElementById(`step-${currentStep}`).classList.remove('hidden');
     }
     updateProgressBar();
 
     for(let i=1; i<=3; i++) {
-        const ind = document.getElementById(ind-${i});
+        const ind = document.getElementById(`ind-${i}`);
         const circle = ind.querySelector('.step-circle');
         
         let isActive = false;
@@ -240,7 +240,7 @@ function updateWizardUI() {
         // هنا تم إصلاح عرض البيانات في صفحة الملخص
         document.getElementById('summary-type').innerText = formData.housingType;
         document.getElementById('summary-services').innerHTML = formData.services.map(s => 
-            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-bold border border-gray-200">${s}</span>
+            `<span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-bold border border-gray-200">${s}</span>`
         ).join('');
     } else {
         nextBtnIcon.setAttribute('data-lucide', 'arrow-left');
@@ -308,7 +308,7 @@ function submitForm() {
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'تم إرسال الطلب بنجاح',
-                text: رقم الطلب: #${newRequest.id},
+                text: `رقم الطلب: #${newRequest.id}`,
                 icon: 'success',
                 confirmButtonText: 'حسناً',
                 confirmButtonColor: '#004D38'
@@ -353,7 +353,7 @@ function loadRequests() {
                     <td class="p-4 text-gray-800">${req.housingType}</td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1">
-                            ${req.services.map(s => <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">${s}</span>).join('')}
+                            ${req.services.map(s => `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">${s}</span>`).join('')}
                         </div>
                     </td>
                     <td class="p-4 text-sm text-gray-500">${req.date}</td>

@@ -8,21 +8,18 @@ let formData = {
 // عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
-    loadRequests(); // تحميل الطلبات من الذاكرة
+    loadRequests();
     updateStats();
 });
 
-// التنقل بين القوائم (الرئيسية - جديد - السجل)
+// التنقل بين القوائم
 function nav(page) {
-    // إخفاء الكل وإظهار المطلوب
     ['home', 'new', 'track'].forEach(p => document.getElementById(`view-${p}`).classList.add('hidden'));
     document.getElementById(`view-${page}`).classList.remove('hidden');
 
-    // تحديث الزر النشط
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`btn-${page}`).classList.add('active');
 
-    // تغيير العنوان
     const titles = {'home': 'الرئيسية', 'new': 'إرسال طلب جديد', 'track': 'متابعة الطلبات'};
     document.getElementById('page-title').innerText = titles[page];
 
@@ -35,9 +32,37 @@ function nav(page) {
     }
 }
 
+// --- دوال مساعدة لإدارة الأخطاء (Red Borders) ---
+
+// إظهار الخطأ (إطار أحمر)
+function showError(stepId) {
+    const cards = document.querySelectorAll(`#${stepId} .select-card`);
+    cards.forEach(card => {
+        card.classList.add('border-red-500', 'ring-1', 'ring-red-500', 'bg-red-50');
+        // حركة اهتزاز بسيطة لجذب الانتباه
+        card.animate([
+            { transform: 'translateX(0)' },
+            { transform: 'translateX(-5px)' },
+            { transform: 'translateX(5px)' },
+            { transform: 'translateX(0)' }
+        ], { duration: 300 });
+    });
+}
+
+// إزالة الخطأ عند الاختيار
+function clearError(stepId) {
+    const cards = document.querySelectorAll(`#${stepId} .select-card`);
+    cards.forEach(card => {
+        card.classList.remove('border-red-500', 'ring-1', 'ring-red-500', 'bg-red-50');
+    });
+}
+
 // --- منطق النموذج (Wizard) ---
 
 function selectHousing(type) {
+    // 1. إزالة أي خطأ سابق بمجرد الاختيار
+    clearError('step-1');
+    
     formData.housingType = type;
     document.querySelectorAll('#step-1 .select-card').forEach(el => el.classList.remove('selected'));
     
@@ -46,6 +71,9 @@ function selectHousing(type) {
 }
 
 function toggleService(card, name) {
+    // 1. إزالة الخطأ بمجرد التفاعل
+    clearError('step-2');
+
     card.classList.toggle('selected');
     const box = card.querySelector('.checkbox-icon');
     
@@ -61,34 +89,32 @@ function toggleService(card, name) {
     }
 }
 
-// زر التالي (المنطق الذكي)
+// زر التالي (مع التحقق الجديد)
 function nextStep() {
-    // 1. التحقق من الخطوة الأولى (نوع السكن)
+    // 1. التحقق من الخطوة الأولى
     if(currentStep === 1) {
         if(!formData.housingType) {
-            alert('⚠️ الرجاء اختيار نوع العقار أولاً');
+            showError('step-1'); // تلوين الخيارات بالأحمر بدلاً من الـ Alert
             return;
         }
-        // هنا التوجيه الذكي لصفحات التحقق
         if(formData.housingType === 'ملكية') {
-            showMOJVerification(); // وزارة العدل
+            showMOJVerification();
         } else {
-            showEjarVerification(); // إيجار
+            showEjarVerification();
         }
         return;
     }
 
-    // 2. إذا كان المستخدم في مرحلة التحقق (الخطوة الوسيطة)
     if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
-        currentStep = 2; // انتقل لاختيار الخدمات
+        currentStep = 2;
         updateWizardUI();
         return;
     }
     
-    // 3. التحقق من الخطوة الثانية (الخدمات)
+    // 2. التحقق من الخطوة الثانية
     if(currentStep === 2) {
         if(formData.services.length === 0) {
-            alert('⚠️ الرجاء اختيار خدمة واحدة على الأقل');
+            showError('step-2'); // تلوين الخيارات بالأحمر
             return;
         }
         currentStep = 3;
@@ -96,14 +122,12 @@ function nextStep() {
         return;
     }
 
-    // 4. الإرسال النهائي
     if(currentStep === 3) {
         submitForm();
         return;
     }
 }
 
-// زر السابق
 function prevStep() {
     if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
         currentStep = 1;
@@ -111,7 +135,6 @@ function prevStep() {
         return;
     }
     if(currentStep === 2) {
-        // إذا رجع من الخدمات، نرجعه للخطوة 1 مباشرة (تجاوز التحقق)
         currentStep = 1; 
         updateWizardUI();
         return;
@@ -123,21 +146,14 @@ function prevStep() {
     }
 }
 
-// --- دوال عرض شاشات التحقق ---
-
 function showMOJVerification() {
     currentStep = 'verify-moj';
-    
-    // إخفاء الجميع
     hideAllSteps();
-    // إظهار وزارة العدل
     const section = document.getElementById('step-verify-moj');
     if(section) {
         section.classList.remove('hidden');
-        // تشغيل المحاكاة (Loading)
         simulateLoading('moj');
     } else {
-        // في حال لم يجد القسم (احتياط)، ينتقل للخطوة 2
         currentStep = 2;
         updateWizardUI();
     }
@@ -146,7 +162,6 @@ function showMOJVerification() {
 
 function showEjarVerification() {
     currentStep = 'verify-ejar';
-    
     hideAllSteps();
     const section = document.getElementById('step-verify-ejar');
     if(section) {
@@ -159,14 +174,12 @@ function showEjarVerification() {
     updateProgressBar();
 }
 
-// محاكاة التحميل (Spinner)
 function simulateLoading(type) {
     const loadingDiv = document.getElementById(`${type}-loading`);
     const dataDiv = document.getElementById(`${type}-data`);
     const badge = document.getElementById(`${type}-status-badge`);
     const nextBtn = document.getElementById('btn-next');
 
-    // إعادة تعيين الحالة
     loadingDiv.classList.remove('hidden');
     dataDiv.classList.add('hidden');
     if(badge) {
@@ -174,11 +187,9 @@ function simulateLoading(type) {
         badge.classList.remove('bg-green-500', 'text-white');
     }
     
-    // قفل زر التالي مؤقتاً
     nextBtn.disabled = true;
     nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
-    // بعد ثانيتين
     setTimeout(() => {
         loadingDiv.classList.add('hidden');
         dataDiv.classList.remove('hidden');
@@ -186,33 +197,26 @@ function simulateLoading(type) {
             badge.innerText = 'تم التحقق ✓';
             badge.classList.add('bg-green-500', 'text-white');
         }
-        // فتح زر التالي
         nextBtn.disabled = false;
         nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         lucide.createIcons();
     }, 2000);
 }
 
-// تحديث الواجهة العامة
 function updateWizardUI() {
     hideAllSteps();
-    
-    // إظهار الخطوة الحالية
     if(typeof currentStep === 'number') {
         document.getElementById(`step-${currentStep}`).classList.remove('hidden');
     }
-
     updateProgressBar();
 
-    // تحديث الدوائر (Stepper)
     for(let i=1; i<=3; i++) {
         const ind = document.getElementById(`ind-${i}`);
         const circle = ind.querySelector('.step-circle');
         const text = ind.querySelector('span');
         
-        // منطق تلوين الدوائر
         let isActive = false;
-        if(i === 1) isActive = true; // دائماً نشطة
+        if(i === 1) isActive = true;
         if(i === 2 && (currentStep === 2 || currentStep === 3)) isActive = true;
         if(i === 3 && currentStep === 3) isActive = true;
 
@@ -229,16 +233,13 @@ function updateWizardUI() {
         }
     }
 
-    // زر الرجوع
     const backBtn = document.getElementById('btn-back');
     if(currentStep === 1) backBtn.classList.add('hidden');
     else backBtn.classList.remove('hidden');
     
-    // زر التالي/الإرسال
     const nextBtn = document.getElementById('btn-next');
     if(currentStep === 3) {
         nextBtn.innerHTML = 'إرسال الطلب <i data-lucide="send" class="w-4 h-4"></i>';
-        // تعبئة الملخص
         document.getElementById('summary-type').innerText = formData.housingType;
         document.getElementById('summary-services').innerHTML = formData.services.map(s => 
             `<span class="bg-emerald-50 text-absherGreen border border-emerald-100 px-2 py-1 rounded text-xs font-bold">${s}</span>`
@@ -246,7 +247,6 @@ function updateWizardUI() {
     } else {
         nextBtn.innerHTML = 'التالي <i data-lucide="arrow-left" class="w-4 h-4"></i>';
     }
-    
     lucide.createIcons();
 }
 
@@ -269,6 +269,8 @@ function updateProgressBar() {
 function resetForm() {
     currentStep = 1;
     formData = { housingType: '', services: [] };
+    clearError('step-1');
+    clearError('step-2');
     document.querySelectorAll('.select-card').forEach(el => {
         el.classList.remove('selected');
         const box = el.querySelector('.checkbox-icon');
@@ -277,7 +279,7 @@ function resetForm() {
     updateWizardUI();
 }
 
-// --- الحفظ (LocalStorage) ---
+// --- الحفظ والإرسال النهائي ---
 
 function submitForm() {
     const btn = document.getElementById('btn-next');
@@ -285,10 +287,8 @@ function submitForm() {
     btn.disabled = true;
 
     setTimeout(() => {
-        // 1. جلب البيانات القديمة
         let requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
         
-        // 2. إنشاء الطلب الجديد
         const newRequest = {
             id: Math.floor(Math.random() * 9000) + 1000,
             housingType: formData.housingType,
@@ -297,14 +297,29 @@ function submitForm() {
             status: 'قيد المعالجة'
         };
 
-        // 3. الحفظ
         requests.unshift(newRequest);
         localStorage.setItem('mersalRequests', JSON.stringify(requests));
 
-        // 4. النهاية
-        alert('✅ تم إرسال الطلب بنجاح');
-        btn.disabled = false;
-        nav('track');
+        // أبقينا التنبيه الجميل فقط عند النجاح
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'تم إرسال الطلب بنجاح',
+                text: 'سيتم معالجة طلب نقل الخدمات وإشعاركم بالتحديثات',
+                icon: 'success',
+                confirmButtonText: 'حسناً',
+                confirmButtonColor: '#006B4D'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btn.disabled = false;
+                    nav('track');
+                }
+            });
+        } else {
+            alert('✅ تم إرسال الطلب بنجاح');
+            btn.disabled = false;
+            nav('track');
+        }
+
     }, 1500);
 }
 

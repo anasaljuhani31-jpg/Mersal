@@ -5,27 +5,25 @@ let formData = {
     services: []
 };
 
-// عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     loadRequests();
     updateStats();
-    // تعيين تاريخ اليوم في صفحة الملخص
-    const summaryDate = document.getElementById('summary-date');
-    if(summaryDate) summaryDate.innerText = new Date().toLocaleDateString('ar-SA');
 });
 
-// التنقل بين القوائم
 function nav(page) {
+    // إخفاء جميع الصفحات وإظهار الصفحة المطلوبة
     ['home', 'new', 'track'].forEach(p => document.getElementById(`view-${p}`).classList.add('hidden'));
     document.getElementById(`view-${page}`).classList.remove('hidden');
 
+    // تحديث القائمة الجانبية
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`btn-${page}`).classList.add('active');
 
+    // تحديث عنوان الصفحة
     const titles = {'home': 'الرئيسية', 'new': 'إرسال طلب جديد', 'track': 'متابعة الطلبات'};
     document.getElementById('page-title').innerHTML = `
-        <div class="w-2 h-8 bg-absherAccent rounded-full"></div>
+        <div class="w-1.5 h-8 bg-absherAccent rounded-full"></div>
         ${titles[page]}
     `;
 
@@ -38,33 +36,28 @@ function nav(page) {
     }
 }
 
-// --- دوال مساعدة لإدارة الأخطاء (Red Borders & Shake) ---
-
+// دوال المساعدة (إظهار الأخطاء)
 function showError(stepId) {
     const cards = document.querySelectorAll(`#${stepId} .select-card`);
     cards.forEach(card => {
-        card.classList.add('border-red-500', 'ring-2', 'ring-red-200', 'bg-red-50/50');
-        // حركة اهتزاز احترافية
+        card.classList.add('border-red-500', 'ring-2', 'ring-red-100', 'bg-red-50/50');
         card.animate([
             { transform: 'translateX(0)' },
-            { transform: 'translateX(-6px) rotate(-1deg)' },
-            { transform: 'translateX(6px) rotate(1deg)' },
-            { transform: 'translateX(-6px) rotate(-1deg)' },
-            { transform: 'translateX(6px) rotate(1deg)' },
+            { transform: 'translateX(-5px)' },
+            { transform: 'translateX(5px)' },
             { transform: 'translateX(0)' }
-        ], { duration: 500, easing: 'cubic-bezier(.36,.07,.19,.97)' });
+        ], { duration: 300 });
     });
 }
 
 function clearError(stepId) {
     const cards = document.querySelectorAll(`#${stepId} .select-card`);
     cards.forEach(card => {
-        card.classList.remove('border-red-500', 'ring-2', 'ring-red-200', 'bg-red-50/50');
+        card.classList.remove('border-red-500', 'ring-2', 'ring-red-100', 'bg-red-50/50');
     });
 }
 
-// --- منطق النموذج (Wizard) ---
-
+// منطق النموذج
 function selectHousing(type) {
     clearError('step-1');
     formData.housingType = type;
@@ -82,22 +75,18 @@ function toggleService(card, name) {
     if(formData.services.includes(name)) {
         formData.services = formData.services.filter(s => s !== name);
         box.innerHTML = '';
-        box.classList.remove('bg-absherGreen', 'border-transparent');
-        box.classList.add('border-gray-200');
+        box.classList.remove('bg-absherDark', 'border-transparent');
     } else {
         formData.services.push(name);
-        // أيقونة صح احترافية
         box.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>';
-        box.classList.remove('border-gray-200');
-        box.classList.add('bg-absherDark', 'border-absherDark');
+        box.classList.add('bg-absherDark', 'border-transparent');
         lucide.createIcons();
     }
 }
 
 function nextStep() {
-    const nextBtnInfo = document.getElementById('btn-next').querySelector('span span');
+    const nextBtnText = document.getElementById('btn-next').querySelector('span');
 
-    // 1. التحقق من الخطوة الأولى
     if(currentStep === 1) {
         if(!formData.housingType) {
             showError('step-1');
@@ -114,11 +103,10 @@ function nextStep() {
     if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
         currentStep = 2;
         updateWizardUI();
-        nextBtnInfo.innerText = 'المتابعة للتالي';
+        nextBtnText.innerText = 'المتابعة للتالي';
         return;
     }
     
-    // 2. التحقق من الخطوة الثانية
     if(currentStep === 2) {
         if(formData.services.length === 0) {
             showError('step-2');
@@ -126,7 +114,7 @@ function nextStep() {
         }
         currentStep = 3;
         updateWizardUI();
-        nextBtnInfo.innerText = 'اعتماد وإرسال الطلب';
+        nextBtnText.innerText = 'اعتماد وإرسال الطلب';
         return;
     }
 
@@ -137,7 +125,7 @@ function nextStep() {
 }
 
 function prevStep() {
-    const nextBtnInfo = document.getElementById('btn-next').querySelector('span span');
+    const nextBtnText = document.getElementById('btn-next').querySelector('span');
 
     if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
         currentStep = 1;
@@ -153,7 +141,7 @@ function prevStep() {
     }
     
     if(currentStep !== 3) {
-         nextBtnInfo.innerText = 'المتابعة للتالي';
+         nextBtnText.innerText = 'المتابعة للتالي';
     }
 }
 
@@ -188,45 +176,32 @@ function showEjarVerification() {
 function simulateLoading(type) {
     const loadingDiv = document.getElementById(`${type}-loading`);
     const dataDiv = document.getElementById(`${type}-data`);
-    const badge = document.getElementById(`${type}-status-badge`);
     const nextBtn = document.getElementById('btn-next');
 
     loadingDiv.classList.remove('hidden');
     dataDiv.classList.add('hidden');
     
-    // تخصيص البادج حسب الجهة
-    if(badge) {
-        badge.innerHTML = type === 'moj' ? 
-            '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> جاري الربط الآمن...' : 
-            '<i data-lucide="satellite-dish" class="w-4 h-4 animate-spin"></i> جاري الاتصال بالشبكة...';
-        badge.classList.remove('bg-green-500/20', 'text-green-300', 'border-green-500/30');
-        badge.classList.add('bg-white/20', 'text-white', 'border-white/30');
-    }
-    
     nextBtn.disabled = true;
-    nextBtn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
     setTimeout(() => {
         loadingDiv.classList.add('hidden');
         dataDiv.classList.remove('hidden');
-        if(badge) {
-            badge.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> تم التحقق بنجاح';
-            badge.classList.remove('bg-white/20', 'text-white', 'border-white/30');
-            badge.classList.add('bg-green-500/20', 'text-green-100', 'border-green-500/30');
-        }
         nextBtn.disabled = false;
-        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         lucide.createIcons();
-    }, 2500); // زيادة الوقت قليلاً للشعور بالواقعية
+    }, 2000);
 }
 
 function updateWizardUI() {
     hideAllSteps();
-    if(typeof currentStep === 'number') {
-        document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+    if(typeof currentStep === 'number' || typeof currentStep === 'string') {
+        const stepId = typeof currentStep === 'string' ? `step-${currentStep}` : `step-${currentStep}`;
+        document.getElementById(stepId)?.classList.remove('hidden');
     }
     updateProgressBar();
 
+    // تحديث الدوائر
     for(let i=1; i<=3; i++) {
         const ind = document.getElementById(`ind-${i}`);
         const circle = ind.querySelector('.step-circle');
@@ -239,11 +214,13 @@ function updateWizardUI() {
 
         if(isActive) {
             circle.classList.add('active');
-            text.classList.remove('text-gray-500', 'font-medium');
+            circle.classList.remove('text-gray-400');
+            text.classList.remove('text-gray-400', 'font-medium');
             text.classList.add('text-absherDark', 'font-bold');
         } else {
             circle.classList.remove('active');
-            text.classList.add('text-gray-500', 'font-medium');
+            circle.classList.add('text-gray-400');
+            text.classList.add('text-gray-400', 'font-medium');
             text.classList.remove('text-absherDark', 'font-bold');
         }
     }
@@ -253,37 +230,24 @@ function updateWizardUI() {
     else backBtn.classList.remove('hidden');
     
     const nextBtn = document.getElementById('btn-next');
-    const nextBtnText = nextBtn.querySelector('span span');
-    const nextBtnIcon = nextBtn.querySelector('span i');
+    const nextBtnIcon = nextBtn.querySelector('i');
 
     if(currentStep === 3) {
-        nextBtnText.innerText = 'اعتماد وإرسال الطلب';
         nextBtnIcon.setAttribute('data-lucide', 'send');
-        nextBtn.classList.add('bg-absherAccent', 'text-absherDark', 'hover:bg-white');
-        nextBtn.classList.remove('bg-absherDark', 'text-white');
-        
-        // تعبئة الملخص
-        const typeIcon = document.getElementById('summary-type-icon');
+        // ✅✅ تعبئة الملخص: التأكد من أن البيانات تظهر هنا
         document.getElementById('summary-type').innerText = formData.housingType;
-        typeIcon.innerHTML = formData.housingType === 'ملكية' ? 
-            '<i data-lucide="building-estate" class="w-6 h-6 text-mojGold"></i>' : 
-            '<i data-lucide="key-round" class="w-6 h-6 text-ejarCyan"></i>';
-
         document.getElementById('summary-services').innerHTML = formData.services.map(s => {
-            let colorClass = s === 'الكهرباء' ? 'blue' : s === 'المياه' ? 'cyan' : 'purple';
-            let icon = s === 'الكهرباء' ? 'zap' : s === 'المياه' ? 'droplets' : 'wifi';
-            return `
-                <span class="bg-${colorClass}-50 text-${colorClass}-700 border border-${colorClass}-200 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
-                    <i data-lucide="${icon}" class="w-4 h-4"></i>
-                    ${s}
-                </span>
-            `;
-        }).join('');
+             let colorClass = s === 'الكهرباء' ? 'blue' : s === 'المياه' ? 'cyan' : 'purple';
+             let icon = s === 'الكهرباء' ? 'zap' : s === 'المياه' ? 'droplets' : 'wifi';
+             return `
+                 <span class="bg-${colorClass}-50 text-${colorClass}-700 border border-${colorClass}-200 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
+                     <i data-lucide="${icon}" class="w-4 h-4"></i>
+                     ${s}
+                 </span>
+             `;
+         }).join('');
     } else {
-        nextBtnText.innerText = 'المتابعة للتالي';
         nextBtnIcon.setAttribute('data-lucide', 'arrow-left');
-        nextBtn.classList.remove('bg-absherAccent', 'text-absherDark', 'hover:bg-white');
-        nextBtn.classList.add('bg-absherDark', 'text-white');
     }
     
     lucide.createIcons();
@@ -315,18 +279,15 @@ function resetForm() {
         const box = el.querySelector('.checkbox-icon');
         if(box) { 
             box.innerHTML = ''; 
-            box.classList.remove('bg-absherDark', 'border-absherDark');
-            box.classList.add('border-gray-200');
+            box.classList.remove('bg-absherDark', 'border-transparent');
         }
     });
     updateWizardUI();
 }
 
-// --- الحفظ والإرسال النهائي ---
-
 function submitForm() {
     const btn = document.getElementById('btn-next');
-    const btnText = btn.querySelector('span span');
+    const btnText = btn.querySelector('span');
     const originalText = btnText.innerText;
     
     btnText.innerText = 'جاري توثيق الطلب...';
@@ -337,7 +298,7 @@ function submitForm() {
         let requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
         
         const newRequest = {
-            id: Math.floor(Math.random() * 900000) + 100000, // رقم طلب أطول وأكثر واقعية
+            id: Math.floor(Math.random() * 900000) + 100000,
             housingType: formData.housingType,
             services: [...formData.services],
             date: new Date().toLocaleDateString('ar-SA'),
@@ -347,7 +308,6 @@ function submitForm() {
         requests.unshift(newRequest);
         localStorage.setItem('mersalRequests', JSON.stringify(requests));
 
-        // تنبيه نجاح فخم باستخدام SweetAlert2
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: '<h3 class="font-bold text-absherDark">تم تقديم الطلب بنجاح</h3>',
@@ -357,29 +317,24 @@ function submitForm() {
                             <i data-lucide="check-circle-2" class="w-10 h-10 text-green-600"></i>
                         </div>
                         <p class="text-gray-600 mb-2">رقم مرجع الطلب: <strong>#${newRequest.id}</strong></p>
-                        <p class="text-sm text-gray-500">سيتم إشعارك عبر الرسائل النصية عند تحديث الحالة.</p>
                     </div>
                 `,
-                icon: null, // نستخدم الأيقونة المخصصة أعلاه
                 showConfirmButton: true,
                 confirmButtonText: 'متابعة حالة الطلب',
                 confirmButtonColor: '#004D38',
                 customClass: {
                     popup: 'rounded-3xl shadow-2xl font-sans',
                     confirmButton: 'font-bold px-6 py-3 rounded-xl text-lg shadow-md'
-                },
-                buttonsStyling: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-80', 'cursor-wait');
-                    btnText.innerText = originalText;
-                    nav('track');
                 }
+            }).then((result) => {
+                btn.disabled = false;
+                btn.classList.remove('opacity-80', 'cursor-wait');
+                btnText.innerText = originalText;
+                nav('track');
             });
-            lucide.createIcons(); // لتشغيل الأيقونة داخل التنبيه
+            lucide.createIcons();
         } else {
-            alert(`✅ تم تقديم الطلب بنجاح برقم مرجعي #${newRequest.id}`);
+            alert('تم الإرسال بنجاح');
             btn.disabled = false;
             nav('track');
         }
@@ -404,17 +359,16 @@ function loadRequests() {
         if(tableContainer) tableContainer.classList.remove('hidden');
         
         requests.forEach(req => {
-            // تنسيق حالة الطلب
             let statusClass = req.status === 'قيد المعالجة' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-green-100 text-green-700 border-green-200';
             let statusIcon = req.status === 'قيد المعالجة' ? 'hourglass' : 'check-circle-2';
 
             tbody.innerHTML += `
                 <tr class="hover:bg-bgLight/50 transition-all group bg-white even:bg-gray-50/30">
-                    <td class="p-6 font-extrabold text-absherDark rounded-r-xl group-hover:text-absherAccent transition">#${req.id}</td>
+                    <td class="p-6 font-extrabold text-absherDark rounded-r-xl">#${req.id}</td>
                     <td class="p-6 font-bold text-gray-800">
                         <div class="flex items-center gap-2">
                             <span class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-                                <i data-lucide="${req.housingType === 'ملكية' ? 'building-estate' : 'key-round'}" class="w-4 h-4"></i>
+                                <i data-lucide="${req.housingType === 'ملكية' ? 'building-2' : 'key-round'}" class="w-4 h-4"></i>
                             </span>
                             ${req.housingType}
                         </div>
@@ -441,23 +395,5 @@ function loadRequests() {
 function updateStats() {
     const requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
     const statTotal = document.getElementById('stat-total');
-    if(statTotal) {
-        // تأثير عداد بسيط
-        let current = 0;
-        const target = requests.length;
-        if (target === 0) {
-            statTotal.innerText = '0';
-            return;
-        }
-        const increment = Math.ceil(target / 20);
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                statTotal.innerText = target;
-                clearInterval(timer);
-            } else {
-                statTotal.innerText = current;
-            }
-        }, 30);
-    }
+    if(statTotal) statTotal.innerText = requests.length;
 }

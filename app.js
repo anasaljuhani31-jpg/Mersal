@@ -12,15 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function nav(page) {
-    // إخفاء جميع الصفحات وإظهار الصفحة المطلوبة
     ['home', 'new', 'track'].forEach(p => document.getElementById(`view-${p}`).classList.add('hidden'));
     document.getElementById(`view-${page}`).classList.remove('hidden');
 
-    // تحديث القائمة الجانبية
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`btn-${page}`).classList.add('active');
 
-    // تحديث عنوان الصفحة
     const titles = {'home': 'الرئيسية', 'new': 'إرسال طلب جديد', 'track': 'متابعة الطلبات'};
     document.getElementById('page-title').innerHTML = `
         <div class="w-1.5 h-8 bg-absherAccent rounded-full"></div>
@@ -36,7 +33,6 @@ function nav(page) {
     }
 }
 
-// دوال المساعدة (إظهار الأخطاء)
 function showError(stepId) {
     const cards = document.querySelectorAll(`#${stepId} .select-card`);
     cards.forEach(card => {
@@ -57,7 +53,6 @@ function clearError(stepId) {
     });
 }
 
-// منطق النموذج
 function selectHousing(type) {
     clearError('step-1');
     formData.housingType = type;
@@ -196,12 +191,13 @@ function simulateLoading(type) {
 function updateWizardUI() {
     hideAllSteps();
     if(typeof currentStep === 'number' || typeof currentStep === 'string') {
+        // Fix for specific ID logic in this version
         const stepId = typeof currentStep === 'string' ? `step-${currentStep}` : `step-${currentStep}`;
-        document.getElementById(stepId)?.classList.remove('hidden');
+        const el = document.getElementById(stepId);
+        if(el) el.classList.remove('hidden');
     }
     updateProgressBar();
 
-    // تحديث الدوائر
     for(let i=1; i<=3; i++) {
         const ind = document.getElementById(`ind-${i}`);
         const circle = ind.querySelector('.step-circle');
@@ -234,7 +230,7 @@ function updateWizardUI() {
 
     if(currentStep === 3) {
         nextBtnIcon.setAttribute('data-lucide', 'send');
-        // ✅✅ تعبئة الملخص: التأكد من أن البيانات تظهر هنا
+        // هنا يتم تعبئة البيانات في الملخص
         document.getElementById('summary-type').innerText = formData.housingType;
         document.getElementById('summary-services').innerHTML = formData.services.map(s => {
              let colorClass = s === 'الكهرباء' ? 'blue' : s === 'المياه' ? 'cyan' : 'purple';

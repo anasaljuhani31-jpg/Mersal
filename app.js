@@ -1,18 +1,15 @@
-// المتغيرات لحفظ البيانات
 let currentStep = 1;
 let formData = {
     housingType: '',
     services: []
 };
 
-// أول ما تشتغل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    lucide.createIcons(); // تشغيل الأيقونات فوراً
-    loadRequests();       // عرض البيانات المحفوظة
-    updateStats();        // تحديث الإحصائيات
+    lucide.createIcons();
+    loadRequests();
+    updateStats();
 });
 
-// التنقل بين الصفحات الرئيسية
 function nav(page) {
     ['home', 'new', 'track'].forEach(p => document.getElementById(`view-${p}`).classList.add('hidden'));
     document.getElementById(`view-${page}`).classList.remove('hidden');
@@ -32,8 +29,6 @@ function nav(page) {
     }
 }
 
-// --- منطق النموذج (Wizard) ---
-
 function selectHousing(type) {
     formData.housingType = type;
     document.querySelectorAll('#step-1 .select-card').forEach(el => el.classList.remove('selected'));
@@ -44,7 +39,7 @@ function selectHousing(type) {
 function toggleService(card, name) {
     card.classList.toggle('selected');
     const box = card.querySelector('.checkbox-icon');
-    
+
     if(formData.services.includes(name)) {
         formData.services = formData.services.filter(s => s !== name);
         box.innerHTML = '';
@@ -58,25 +53,154 @@ function toggleService(card, name) {
 }
 
 function nextStep() {
-    if(currentStep === 1 && !formData.housingType) return alert('⚠️ الرجاء اختيار نوع العقار أولاً');
-    if(currentStep === 2 && formData.services.length === 0) return alert('⚠️ الرجاء اختيار خدمة واحدة على الأقل');
-    if(currentStep === 3) { submitForm(); return; }
+    if(currentStep === 1) {
+        if(!formData.housingType) {
+            alert('⚠️ الرجاء اختيار نوع العقار أولاً');
+            return;
+        }
 
-    currentStep++;
-    updateWizardUI();
+        if(formData.housingType === 'ملكية') {
+            showMOJVerification();
+        } else if(formData.housingType === 'إيجار') {
+            showEjarVerification();
+        }
+        return;
+    }
+
+    if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
+        currentStep = 2;
+        updateWizardUI();
+        return;
+    }
+
+    if(currentStep === 2) {
+        if(formData.services.length === 0) {
+            alert('⚠️ الرجاء اختيار خدمة واحدة على الأقل');
+            return;
+        }
+        currentStep = 3;
+        updateWizardUI();
+        return;
+    }
+
+    if(currentStep === 3) {
+        submitForm();
+        return;
+    }
 }
 
 function prevStep() {
-    currentStep--;
-    updateWizardUI();
+    if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
+        currentStep = 1;
+        updateWizardUI();
+        return;
+    }
+
+    if(currentStep === 2) {
+        currentStep = 1;
+        updateWizardUI();
+        return;
+    }
+
+    if(currentStep === 3) {
+        currentStep = 2;
+        updateWizardUI();
+        return;
+    }
+}
+
+function showMOJVerification() {
+    currentStep = 'verify-moj';
+
+    ['step-1', 'step-verify-moj', 'step-verify-ejar', 'step-2', 'step-3'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+
+    const mojStep = document.getElementById('step-verify-moj');
+    mojStep.classList.remove('hidden');
+
+    const loadingDiv = document.getElementById('moj-loading');
+    const dataDiv = document.getElementById('moj-data');
+    const statusBadge = document.getElementById('moj-status-badge');
+
+    loadingDiv.classList.remove('hidden');
+    dataDiv.classList.add('hidden');
+    statusBadge.innerText = 'جاري الاتصال...';
+
+    document.getElementById('btn-back').classList.remove('hidden');
+    const nextBtn = document.getElementById('btn-next');
+    nextBtn.disabled = true;
+    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    setTimeout(() => {
+        loadingDiv.classList.add('hidden');
+        dataDiv.classList.remove('hidden');
+        statusBadge.innerText = 'تم التحقق ✓';
+        statusBadge.classList.add('bg-green-500');
+
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        lucide.createIcons();
+    }, 2000);
+}
+
+function showEjarVerification() {
+    currentStep = 'verify-ejar';
+
+    ['step-1', 'step-verify-moj', 'step-verify-ejar', 'step-2', 'step-3'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+
+    const ejarStep = document.getElementById('step-verify-ejar');
+    ejarStep.classList.remove('hidden');
+
+    const loadingDiv = document.getElementById('ejar-loading');
+    const dataDiv = document.getElementById('ejar-data');
+    const statusBadge = document.getElementById('ejar-status-badge');
+
+    loadingDiv.classList.remove('hidden');
+    dataDiv.classList.add('hidden');
+    statusBadge.innerText = 'جاري الاتصال...';
+
+    document.getElementById('btn-back').classList.remove('hidden');
+    const nextBtn = document.getElementById('btn-next');
+    nextBtn.disabled = true;
+    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    setTimeout(() => {
+        loadingDiv.classList.add('hidden');
+        dataDiv.classList.remove('hidden');
+        statusBadge.innerText = 'تم التحقق ✓';
+        statusBadge.classList.add('bg-green-500');
+
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        lucide.createIcons();
+    }, 2000);
 }
 
 function updateWizardUI() {
-    [1, 2, 3].forEach(i => document.getElementById(`step-${i}`).classList.add('hidden'));
-    document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+    ['step-1', 'step-verify-moj', 'step-verify-ejar', 'step-2', 'step-3'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+
+    if(currentStep === 1) {
+        document.getElementById('step-1').classList.remove('hidden');
+    } else if(currentStep === 'verify-moj') {
+        document.getElementById('step-verify-moj').classList.remove('hidden');
+    } else if(currentStep === 'verify-ejar') {
+        document.getElementById('step-verify-ejar').classList.remove('hidden');
+    } else if(currentStep === 2) {
+        document.getElementById('step-2').classList.remove('hidden');
+    } else if(currentStep === 3) {
+        document.getElementById('step-3').classList.remove('hidden');
+    }
 
     const progress = document.getElementById('progress-bar');
     if(currentStep === 1) progress.style.width = '0%';
+    if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') progress.style.width = '25%';
     if(currentStep === 2) progress.style.width = '50%';
     if(currentStep === 3) progress.style.width = '100%';
 
@@ -84,8 +208,13 @@ function updateWizardUI() {
         const ind = document.getElementById(`ind-${i}`);
         const circle = ind.querySelector('.step-circle');
         const text = ind.querySelector('span');
-        
-        if(i <= currentStep) {
+
+        let isActive = false;
+        if(i === 1 && (currentStep === 1 || currentStep === 'verify-moj' || currentStep === 'verify-ejar')) isActive = true;
+        if(i === 2 && currentStep === 2) isActive = true;
+        if(i === 3 && currentStep === 3) isActive = true;
+
+        if(isActive) {
             circle.classList.remove('text-gray-400');
             circle.classList.add('bg-absherGreen', 'border-absherGreen', 'text-white');
             text.classList.add('text-absherDark', 'font-bold');
@@ -99,12 +228,12 @@ function updateWizardUI() {
     }
 
     document.getElementById('btn-back').classList.toggle('hidden', currentStep === 1);
-    
+
     const nextBtn = document.getElementById('btn-next');
     if(currentStep === 3) {
         nextBtn.innerHTML = 'إرسال الطلب <i data-lucide="send" class="w-4 h-4"></i>';
         document.getElementById('summary-type').innerText = formData.housingType;
-        document.getElementById('summary-services').innerHTML = formData.services.map(s => 
+        document.getElementById('summary-services').innerHTML = formData.services.map(s =>
             `<span class="bg-emerald-50 text-absherGreen border border-emerald-100 px-2 py-1 rounded text-xs font-bold">${s}</span>`
         ).join('');
     } else {
@@ -119,37 +248,54 @@ function resetForm() {
     document.querySelectorAll('.select-card').forEach(el => {
         el.classList.remove('selected');
         const box = el.querySelector('.checkbox-icon');
-        if(box) { box.innerHTML = ''; box.classList.remove('bg-absherGreen', 'border-transparent'); }
+        if(box) {
+            box.innerHTML = '';
+            box.classList.remove('bg-absherGreen', 'border-transparent');
+        }
     });
+
+    const mojLoading = document.getElementById('moj-loading');
+    const mojData = document.getElementById('moj-data');
+    const mojBadge = document.getElementById('moj-status-badge');
+    if(mojLoading) mojLoading.classList.remove('hidden');
+    if(mojData) mojData.classList.add('hidden');
+    if(mojBadge) {
+        mojBadge.innerText = 'جاري الاتصال...';
+        mojBadge.classList.remove('bg-green-500');
+    }
+
+    const ejarLoading = document.getElementById('ejar-loading');
+    const ejarData = document.getElementById('ejar-data');
+    const ejarBadge = document.getElementById('ejar-status-badge');
+    if(ejarLoading) ejarLoading.classList.remove('hidden');
+    if(ejarData) ejarData.classList.add('hidden');
+    if(ejarBadge) {
+        ejarBadge.innerText = 'جاري الاتصال...';
+        ejarBadge.classList.remove('bg-green-500');
+    }
+
     updateWizardUI();
 }
-
-// --- التعامل مع البيانات (Local Storage بديل قاعدة البيانات) ---
 
 function submitForm() {
     const btn = document.getElementById('btn-next');
     btn.innerText = 'جاري المعالجة...';
     btn.disabled = true;
 
-    // محاكاة تأخير الشبكة لتبدو واقعية
     setTimeout(() => {
-        // 1. جلب البيانات القديمة
         let requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
-        
-        // 2. إنشاء الطلب الجديد
+
         const newRequest = {
-            id: Math.floor(Math.random() * 9000) + 1000, // رقم عشوائي
+            id: Math.floor(Math.random() * 9000) + 1000,
             housingType: formData.housingType,
             services: [...formData.services],
             date: new Date().toLocaleDateString('ar-SA'),
             status: 'قيد المعالجة'
         };
 
-        // 3. الحفظ
-        requests.unshift(newRequest); // إضافة في البداية
+        requests.unshift(newRequest);
         localStorage.setItem('mersalRequests', JSON.stringify(requests));
 
-        // 4. التوجيه
         alert('✅ تم إرسال الطلب بنجاح');
         btn.disabled = false;
         nav('track');
@@ -172,8 +318,8 @@ function loadRequests() {
                 <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                     <td class="p-6 font-bold text-gray-700">#${req.id}</td>
                     <td class="p-6 font-bold text-gray-800">
-                        ${req.housingType} 
-                        <span class="text-xs text-gray-400 mx-2">|</span> 
+                        ${req.housingType}
+                        <span class="text-xs text-gray-400 mx-2">|</span>
                         <span class="text-absherGreen text-xs">${req.services.join('، ')}</span>
                     </td>
                     <td class="p-6 text-sm text-gray-500">${req.date}</td>
@@ -186,7 +332,6 @@ function loadRequests() {
 
 function updateStats() {
     const requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
-    // تحديث الرقم في الصفحة الرئيسية
     const statTotal = document.getElementById('stat-total');
     if(statTotal) statTotal.innerText = requests.length;
 }

@@ -5,27 +5,29 @@ let formData = {
     services: []
 };
 
-// عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     loadRequests();
     updateStats();
-    // تعيين تاريخ اليوم في صفحة الملخص
-    const summaryDate = document.getElementById('summary-date');
-    if(summaryDate) summaryDate.innerText = new Date().toLocaleDateString('ar-SA');
 });
 
-// التنقل بين القوائم
 function nav(page) {
-    ['home', 'new', 'track'].forEach(p => document.getElementById(`view-${p}`).classList.add('hidden'));
-    document.getElementById(`view-${page}`).classList.remove('hidden');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+    }
+
+    ['home', 'new', 'track'].forEach(p => document.getElementById(view-${p}).classList.add('hidden'));
+    document.getElementById(view-${page}).classList.remove('hidden');
 
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`btn-${page}`).classList.add('active');
+    document.getElementById(btn-${page}).classList.add('active');
 
     const titles = {'home': 'الرئيسية', 'new': 'إرسال طلب جديد', 'track': 'متابعة الطلبات'};
     document.getElementById('page-title').innerHTML = `
-        <div class="w-2 h-8 bg-absherAccent rounded-full"></div>
+        <div class="w-1.5 h-6 bg-absherAccent rounded-full"></div>
         ${titles[page]}
     `;
 
@@ -38,32 +40,32 @@ function nav(page) {
     }
 }
 
-// --- دوال مساعدة لإدارة الأخطاء (Red Borders & Shake) ---
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+}
 
 function showError(stepId) {
-    const cards = document.querySelectorAll(`#${stepId} .select-card`);
+    const cards = document.querySelectorAll(#${stepId} .select-card);
     cards.forEach(card => {
         card.classList.add('border-red-500', 'ring-2', 'ring-red-200', 'bg-red-50/50');
-        // حركة اهتزاز احترافية
         card.animate([
             { transform: 'translateX(0)' },
-            { transform: 'translateX(-6px) rotate(-1deg)' },
-            { transform: 'translateX(6px) rotate(1deg)' },
-            { transform: 'translateX(-6px) rotate(-1deg)' },
-            { transform: 'translateX(6px) rotate(1deg)' },
+            { transform: 'translateX(-5px)' },
+            { transform: 'translateX(5px)' },
             { transform: 'translateX(0)' }
-        ], { duration: 500, easing: 'cubic-bezier(.36,.07,.19,.97)' });
+        ], { duration: 400 });
     });
 }
 
 function clearError(stepId) {
-    const cards = document.querySelectorAll(`#${stepId} .select-card`);
+    const cards = document.querySelectorAll(#${stepId} .select-card);
     cards.forEach(card => {
         card.classList.remove('border-red-500', 'ring-2', 'ring-red-200', 'bg-red-50/50');
     });
 }
-
-// --- منطق النموذج (Wizard) ---
 
 function selectHousing(type) {
     clearError('step-1');
@@ -86,7 +88,6 @@ function toggleService(card, name) {
         box.classList.add('border-gray-200');
     } else {
         formData.services.push(name);
-        // أيقونة صح احترافية
         box.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>';
         box.classList.remove('border-gray-200');
         box.classList.add('bg-absherDark', 'border-absherDark');
@@ -95,9 +96,9 @@ function toggleService(card, name) {
 }
 
 function nextStep() {
-    const nextBtnInfo = document.getElementById('btn-next').querySelector('span span');
+    const nextBtn = document.getElementById('btn-next');
+    const nextBtnText = nextBtn.querySelector('span');
 
-    // 1. التحقق من الخطوة الأولى
     if(currentStep === 1) {
         if(!formData.housingType) {
             showError('step-1');
@@ -114,11 +115,10 @@ function nextStep() {
     if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
         currentStep = 2;
         updateWizardUI();
-        nextBtnInfo.innerText = 'المتابعة للتالي';
+        nextBtnText.innerText = 'التالي';
         return;
     }
     
-    // 2. التحقق من الخطوة الثانية
     if(currentStep === 2) {
         if(formData.services.length === 0) {
             showError('step-2');
@@ -126,7 +126,7 @@ function nextStep() {
         }
         currentStep = 3;
         updateWizardUI();
-        nextBtnInfo.innerText = 'اعتماد وإرسال الطلب';
+        nextBtnText.innerText = 'إرسال';
         return;
     }
 
@@ -137,7 +137,7 @@ function nextStep() {
 }
 
 function prevStep() {
-    const nextBtnInfo = document.getElementById('btn-next').querySelector('span span');
+    const nextBtnText = document.getElementById('btn-next').querySelector('span');
 
     if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') {
         currentStep = 1;
@@ -153,7 +153,7 @@ function prevStep() {
     }
     
     if(currentStep !== 3) {
-         nextBtnInfo.innerText = 'المتابعة للتالي';
+         nextBtnText.innerText = 'التالي';
     }
 }
 
@@ -186,51 +186,35 @@ function showEjarVerification() {
 }
 
 function simulateLoading(type) {
-    const loadingDiv = document.getElementById(`${type}-loading`);
-    const dataDiv = document.getElementById(`${type}-data`);
-    const badge = document.getElementById(`${type}-status-badge`);
+    const loadingDiv = document.getElementById(${type}-loading);
+    const dataDiv = document.getElementById(${type}-data);
     const nextBtn = document.getElementById('btn-next');
 
     loadingDiv.classList.remove('hidden');
     dataDiv.classList.add('hidden');
     
-    // تخصيص البادج حسب الجهة
-    if(badge) {
-        badge.innerHTML = type === 'moj' ? 
-            '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> جاري الربط الآمن...' : 
-            '<i data-lucide="satellite-dish" class="w-4 h-4 animate-spin"></i> جاري الاتصال بالشبكة...';
-        badge.classList.remove('bg-green-500/20', 'text-green-300', 'border-green-500/30');
-        badge.classList.add('bg-white/20', 'text-white', 'border-white/30');
-    }
-    
     nextBtn.disabled = true;
-    nextBtn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
     setTimeout(() => {
         loadingDiv.classList.add('hidden');
         dataDiv.classList.remove('hidden');
-        if(badge) {
-            badge.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> تم التحقق بنجاح';
-            badge.classList.remove('bg-white/20', 'text-white', 'border-white/30');
-            badge.classList.add('bg-green-500/20', 'text-green-100', 'border-green-500/30');
-        }
         nextBtn.disabled = false;
-        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         lucide.createIcons();
-    }, 2500); // زيادة الوقت قليلاً للشعور بالواقعية
+    }, 2000);
 }
 
 function updateWizardUI() {
     hideAllSteps();
     if(typeof currentStep === 'number') {
-        document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+        document.getElementById(step-${currentStep}).classList.remove('hidden');
     }
     updateProgressBar();
 
     for(let i=1; i<=3; i++) {
-        const ind = document.getElementById(`ind-${i}`);
+        const ind = document.getElementById(ind-${i});
         const circle = ind.querySelector('.step-circle');
-        const text = ind.querySelector('span');
         
         let isActive = false;
         if(i === 1) isActive = true;
@@ -239,12 +223,8 @@ function updateWizardUI() {
 
         if(isActive) {
             circle.classList.add('active');
-            text.classList.remove('text-gray-500', 'font-medium');
-            text.classList.add('text-absherDark', 'font-bold');
         } else {
             circle.classList.remove('active');
-            text.classList.add('text-gray-500', 'font-medium');
-            text.classList.remove('text-absherDark', 'font-bold');
         }
     }
 
@@ -253,37 +233,17 @@ function updateWizardUI() {
     else backBtn.classList.remove('hidden');
     
     const nextBtn = document.getElementById('btn-next');
-    const nextBtnText = nextBtn.querySelector('span span');
-    const nextBtnIcon = nextBtn.querySelector('span i');
+    const nextBtnIcon = nextBtn.querySelector('i');
 
     if(currentStep === 3) {
-        nextBtnText.innerText = 'اعتماد وإرسال الطلب';
         nextBtnIcon.setAttribute('data-lucide', 'send');
-        nextBtn.classList.add('bg-absherAccent', 'text-absherDark', 'hover:bg-white');
-        nextBtn.classList.remove('bg-absherDark', 'text-white');
-        
-        // تعبئة الملخص
-        const typeIcon = document.getElementById('summary-type-icon');
+        // هنا تم إصلاح عرض البيانات في صفحة الملخص
         document.getElementById('summary-type').innerText = formData.housingType;
-        typeIcon.innerHTML = formData.housingType === 'ملكية' ? 
-            '<i data-lucide="building-estate" class="w-6 h-6 text-mojGold"></i>' : 
-            '<i data-lucide="key-round" class="w-6 h-6 text-ejarCyan"></i>';
-
-        document.getElementById('summary-services').innerHTML = formData.services.map(s => {
-            let colorClass = s === 'الكهرباء' ? 'blue' : s === 'المياه' ? 'cyan' : 'purple';
-            let icon = s === 'الكهرباء' ? 'zap' : s === 'المياه' ? 'droplets' : 'wifi';
-            return `
-                <span class="bg-${colorClass}-50 text-${colorClass}-700 border border-${colorClass}-200 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
-                    <i data-lucide="${icon}" class="w-4 h-4"></i>
-                    ${s}
-                </span>
-            `;
-        }).join('');
+        document.getElementById('summary-services').innerHTML = formData.services.map(s => 
+            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-bold border border-gray-200">${s}</span>
+        ).join('');
     } else {
-        nextBtnText.innerText = 'المتابعة للتالي';
         nextBtnIcon.setAttribute('data-lucide', 'arrow-left');
-        nextBtn.classList.remove('bg-absherAccent', 'text-absherDark', 'hover:bg-white');
-        nextBtn.classList.add('bg-absherDark', 'text-white');
     }
     
     lucide.createIcons();
@@ -299,9 +259,9 @@ function hideAllSteps() {
 
 function updateProgressBar() {
     const progress = document.getElementById('progress-bar');
-    if(currentStep === 1) progress.style.width = '5%';
-    if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') progress.style.width = '35%';
-    if(currentStep === 2) progress.style.width = '65%';
+    if(currentStep === 1) progress.style.width = '0%';
+    if(currentStep === 'verify-moj' || currentStep === 'verify-ejar') progress.style.width = '33%';
+    if(currentStep === 2) progress.style.width = '66%';
     if(currentStep === 3) progress.style.width = '100%';
 }
 
@@ -322,22 +282,20 @@ function resetForm() {
     updateWizardUI();
 }
 
-// --- الحفظ والإرسال النهائي ---
-
 function submitForm() {
     const btn = document.getElementById('btn-next');
-    const btnText = btn.querySelector('span span');
+    const btnText = btn.querySelector('span');
     const originalText = btnText.innerText;
     
-    btnText.innerText = 'جاري توثيق الطلب...';
+    btnText.innerText = 'جاري الإرسال...';
     btn.disabled = true;
-    btn.classList.add('opacity-80', 'cursor-wait');
+    btn.classList.add('opacity-80');
 
     setTimeout(() => {
         let requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
         
         const newRequest = {
-            id: Math.floor(Math.random() * 900000) + 100000, // رقم طلب أطول وأكثر واقعية
+            id: Math.floor(Math.random() * 900000) + 100000,
             housingType: formData.housingType,
             services: [...formData.services],
             date: new Date().toLocaleDateString('ar-SA'),
@@ -347,39 +305,21 @@ function submitForm() {
         requests.unshift(newRequest);
         localStorage.setItem('mersalRequests', JSON.stringify(requests));
 
-        // تنبيه نجاح فخم باستخدام SweetAlert2
         if (typeof Swal !== 'undefined') {
             Swal.fire({
-                title: '<h3 class="font-bold text-absherDark">تم تقديم الطلب بنجاح</h3>',
-                html: `
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-green-100 mx-auto rounded-full flex items-center justify-center mb-4">
-                            <i data-lucide="check-circle-2" class="w-10 h-10 text-green-600"></i>
-                        </div>
-                        <p class="text-gray-600 mb-2">رقم مرجع الطلب: <strong>#${newRequest.id}</strong></p>
-                        <p class="text-sm text-gray-500">سيتم إشعارك عبر الرسائل النصية عند تحديث الحالة.</p>
-                    </div>
-                `,
-                icon: null, // نستخدم الأيقونة المخصصة أعلاه
-                showConfirmButton: true,
-                confirmButtonText: 'متابعة حالة الطلب',
-                confirmButtonColor: '#004D38',
-                customClass: {
-                    popup: 'rounded-3xl shadow-2xl font-sans',
-                    confirmButton: 'font-bold px-6 py-3 rounded-xl text-lg shadow-md'
-                },
-                buttonsStyling: false
+                title: 'تم إرسال الطلب بنجاح',
+                text: رقم الطلب: #${newRequest.id},
+                icon: 'success',
+                confirmButtonText: 'حسناً',
+                confirmButtonColor: '#004D38'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-80', 'cursor-wait');
-                    btnText.innerText = originalText;
-                    nav('track');
-                }
+                btn.disabled = false;
+                btn.classList.remove('opacity-80');
+                btnText.innerText = originalText;
+                nav('track');
             });
-            lucide.createIcons(); // لتشغيل الأيقونة داخل التنبيه
         } else {
-            alert(`✅ تم تقديم الطلب بنجاح برقم مرجعي #${newRequest.id}`);
+            alert('تم الإرسال بنجاح');
             btn.disabled = false;
             nav('track');
         }
@@ -391,7 +331,7 @@ function loadRequests() {
     const requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
     const tbody = document.getElementById('table-body');
     const emptyState = document.getElementById('empty-state');
-    const tableContainer = tbody.parentElement;
+    const tableContainer = tbody.parentElement.parentElement;
 
     if(!tbody) return;
     tbody.innerHTML = '';
@@ -404,29 +344,21 @@ function loadRequests() {
         if(tableContainer) tableContainer.classList.remove('hidden');
         
         requests.forEach(req => {
-            // تنسيق حالة الطلب
-            let statusClass = req.status === 'قيد المعالجة' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-green-100 text-green-700 border-green-200';
-            let statusIcon = req.status === 'قيد المعالجة' ? 'hourglass' : 'check-circle-2';
+            let statusClass = req.status === 'قيد المعالجة' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+            let statusIcon = req.status === 'قيد المعالجة' ? 'hourglass' : 'check-circle';
 
             tbody.innerHTML += `
-                <tr class="hover:bg-bgLight/50 transition-all group bg-white even:bg-gray-50/30">
-                    <td class="p-6 font-extrabold text-absherDark rounded-r-xl group-hover:text-absherAccent transition">#${req.id}</td>
-                    <td class="p-6 font-bold text-gray-800">
-                        <div class="flex items-center gap-2">
-                            <span class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-                                <i data-lucide="${req.housingType === 'ملكية' ? 'building-estate' : 'key-round'}" class="w-4 h-4"></i>
-                            </span>
-                            ${req.housingType}
+                <tr class="hover:bg-gray-50 border-b border-gray-100">
+                    <td class="p-4 font-bold text-absherDark">#${req.id}</td>
+                    <td class="p-4 text-gray-800">${req.housingType}</td>
+                    <td class="p-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${req.services.map(s => <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">${s}</span>).join('')}
                         </div>
                     </td>
-                    <td class="p-6">
-                        <div class="flex flex-wrap gap-2">
-                            ${req.services.map(s => `<span class="bg-white border border-gray-200 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold shadow-sm">${s}</span>`).join('')}
-                        </div>
-                    </td>
-                    <td class="p-6 text-sm font-medium text-gray-500">${req.date}</td>
-                    <td class="p-6 rounded-l-xl">
-                        <span class="${statusClass} border px-4 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-1 shadow-sm">
+                    <td class="p-4 text-sm text-gray-500">${req.date}</td>
+                    <td class="p-4">
+                        <span class="${statusClass} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
                             <i data-lucide="${statusIcon}" class="w-3 h-3"></i>
                             ${req.status}
                         </span>
@@ -441,23 +373,5 @@ function loadRequests() {
 function updateStats() {
     const requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
     const statTotal = document.getElementById('stat-total');
-    if(statTotal) {
-        // تأثير عداد بسيط
-        let current = 0;
-        const target = requests.length;
-        if (target === 0) {
-            statTotal.innerText = '0';
-            return;
-        }
-        const increment = Math.ceil(target / 20);
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                statTotal.innerText = target;
-                clearInterval(timer);
-            } else {
-                statTotal.innerText = current;
-            }
-        }, 30);
-    }
+    if(statTotal) statTotal.innerText = requests.length;
 }

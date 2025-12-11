@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة مرسال</title>
+    <title>منصة مرسال | الخدمات الإلكترونية</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -21,178 +22,411 @@
                         mojGold: '#C6A87C',
                         ejarCyan: '#008C99',
                     },
-                    fontFamily: { sans: ['Tajawal', 'sans-serif'] }
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    }
                 }
             }
         }
     </script>
+
     <style>
         body { background-color: #F8F9FA; }
-        .step-circle { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #E5E7EB; display: flex; align-items: center; justify-content: center; background: white; z-index: 10; font-weight: bold; transition: all 0.3s; }
+        
+        .step-circle {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid #E5E7EB; display: flex;
+            align-items: center; justify-content: center;
+            background: white; z-index: 10; font-weight: bold; transition: all 0.3s;
+        }
         .step-circle.active { background: #004D38; border-color: #D4AF37; color: white; }
+        
         .select-card { cursor: pointer; border: 2px solid transparent; background: white; transition: all 0.3s; }
-        .select-card:hover { transform: translateY(-3px); border-color: #006B4D; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .select-card.selected { border-color: #004D38; background-color: #F0FDF9; box-shadow: 0 0 0 1px #004D38; }
-        .nav-item.active { background: rgba(0,0,0,0.2); border-right: 4px solid #D4AF37; font-weight: bold; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #004D38; border-radius: 50%; animation: spin 1s linear infinite; }
+        .select-card:hover { transform: translateY(-4px); border-color: #006B4D; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .select-card.selected { border-color: #004D38; background-color: #F6FFFC; }
+        
+        .nav-item { border-right: 4px solid transparent; transition: 0.2s; }
+        .nav-item:hover { background-color: rgba(255,255,255,0.05); }
+        .nav-item.active { background: rgba(0,0,0,0.2); border-right-color: #D4AF37; font-weight: bold; }
+        
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #f3f3f3;
+            border-top: 4px solid #004D38; border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .animate-fade { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-700 font-sans bg-bgLight">
 
-    <aside class="w-72 bg-absherDark text-white flex flex-col shadow-2xl z-50 hidden md:flex">
-        <div class="h-24 flex items-center px-8 border-b border-white/10">
-            <div class="flex items-center gap-4">
-                <div class="w-11 h-11 bg-white/10 rounded-lg flex items-center justify-center border border-white/20">
-                    <i data-lucide="building-2" class="w-7 h-7 text-absherAccent"></i>
-                </div>
-                <h1 class="text-white text-3xl font-extrabold tracking-wide">مرسال</h1>
-            </div>
+    <aside class="w-72 bg-absherDark text-white flex flex-col shadow-2xl z-50">
+        <div class="h-24 flex items-center justify-center border-b border-white/10 relative p-4">
+             <div class="absolute bottom-0 w-full h-0.5 bg-absherAccent"></div>
+             
+             <div class="flex items-center gap-3">
+                 <img src="logo.png" 
+                      id="app-logo-img"
+                      alt="Mersal" 
+                      class="h-12 w-auto object-contain bg-white/10 rounded p-1"
+                      onerror="this.style.display='none'; document.getElementById('app-logo-text').style.display='block'">
+                 
+                 <h1 id="app-logo-text" class="text-3xl font-extrabold tracking-wide hidden">مرسال</h1>
+             </div>
         </div>
         
         <nav class="flex-1 py-8 space-y-2 px-3">
-            <button onclick="nav('home')" id="btn-home" class="nav-item active w-full flex items-center gap-4 px-4 py-4 text-right rounded-lg"><i data-lucide="layout-grid" class="w-5 h-5"></i> الرئيسية</button>
-            <button onclick="nav('new')" id="btn-new" class="nav-item w-full flex items-center gap-4 px-4 py-4 text-right rounded-lg"><i data-lucide="file-plus" class="w-5 h-5"></i> نقل الخدمات</button>
-            <button onclick="nav('track')" id="btn-track" class="nav-item w-full flex items-center gap-4 px-4 py-4 text-right rounded-lg"><i data-lucide="history" class="w-5 h-5"></i> سجل الطلبات</button>
+            <button onclick="nav('home')" id="btn-home" class="nav-item active w-full flex items-center gap-4 px-4 py-4 text-right rounded-lg">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                <span class="text-base">الرئيسية</span>
+            </button>
+            <button onclick="nav('new')" id="btn-new" class="nav-item w-full flex items-center gap-4 px-4 py-4 text-right rounded-lg text-gray-100">
+                <i data-lucide="file-plus" class="w-5 h-5"></i>
+                <span class="text-base">نقل الخدمات</span>
+            </button>
+            <button onclick="nav('track')" id="btn-track" class="nav-item w-full flex items-center gap-4 px-4 py-4 text-right rounded-lg text-gray-100">
+                <i data-lucide="history" class="w-5 h-5"></i>
+                <span class="text-base">سجل الطلبات</span>
+            </button>
         </nav>
+
+        <div class="p-6 border-t border-white/10 bg-black/10">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="font-bold text-sm">المستخدم</p>
+                    <p class="text-xs text-absherAccent cursor-pointer hover:underline">تسجيل الخروج</p>
+                </div>
+            </div>
+        </div>
     </aside>
 
     <main class="flex-1 flex flex-col h-screen relative overflow-hidden">
         <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-20">
-            <h2 id="page-title" class="text-xl font-bold text-absherDark flex items-center gap-2"><div class="w-1.5 h-8 bg-absherAccent rounded-full"></div> الرئيسية</h2>
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-absherLight rounded-full flex items-center justify-center border border-absherGreen text-absherDark"><i data-lucide="user" class="w-6 h-6"></i></div>
+            <h2 id="page-title" class="text-xl font-bold text-absherDark flex items-center gap-2">
+                <div class="w-1.5 h-8 bg-absherAccent rounded-full"></div>
+                الرئيسية
+            </h2>
+
+            <div class="flex items-center gap-6">
+                <div class="cursor-pointer flex items-center gap-1 text-gray-500 hover:text-absherDark font-bold">
+                    <span>English</span>
+                    <i data-lucide="globe" class="w-4 h-4"></i>
+                </div>
+                <div class="relative cursor-pointer">
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-600 hover:text-absherDark"></i>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                </div>
+                <div class="w-10 h-10 bg-absherLight rounded-full flex items-center justify-center border border-absherGreen text-absherDark">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
             </div>
         </header>
 
         <div class="p-8 overflow-y-auto flex-1 bg-bgLight">
             
-            <section id="view-home" class="animate-fade space-y-8">
+            <section id="view-home" class="animate-fade-in-up space-y-8">
                 <div class="bg-gradient-to-r from-absherDark to-absherGreen rounded-2xl p-10 text-white shadow-lg relative overflow-hidden">
                     <div class="relative z-10">
-                        <h2 class="text-3xl font-bold mb-3">مرحباً بك في منصة مرسال</h2>
-                        <p class="opacity-90 text-lg mb-6">بوابتك الوطنية الموحدة لإدارة ونقل الخدمات الحكومية.</p>
-                        <button onclick="nav('new')" class="bg-absherAccent text-absherDark px-8 py-3 rounded-xl font-bold hover:bg-white transition flex items-center gap-2">ابدأ طلب جديد <i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                        <h2 class="text-3xl font-bold mb-3">أهلاً بك في منصة مرسال</h2>
+                        <p class="opacity-90 text-lg font-medium max-w-2xl">بوابتك الوطنية الموحدة لإدارة ونقل الخدمات الحكومية بكل يسر وموثوقية.</p>
+                        <button onclick="nav('new')" class="mt-8 bg-absherAccent text-absherDark px-8 py-3 rounded-xl font-bold hover:bg-white transition flex items-center gap-2 shadow-md">
+                            ابدأ طلب جديد <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        </button>
                     </div>
                     <i data-lucide="shield-check" class="absolute -left-10 -bottom-10 w-64 h-64 text-white/10 rotate-12"></i>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-8 rounded-2xl border-t-4 border-absherDark shadow-sm"><p class="text-gray-500 font-bold">إجمالي الطلبات</p><p class="text-4xl font-extrabold text-absherDark mt-2" id="stat-total">0</p></div>
-                    <div class="bg-white p-8 rounded-2xl border-t-4 border-amber-500 shadow-sm"><p class="text-gray-500 font-bold">قيد المعالجة</p><p class="text-4xl font-extrabold text-gray-800 mt-2">0</p></div>
-                    <div class="bg-white p-8 rounded-2xl border-t-4 border-green-500 shadow-sm"><p class="text-gray-500 font-bold">مكتملة</p><p class="text-4xl font-extrabold text-gray-800 mt-2">0</p></div>
+                    <div class="bg-white p-8 rounded-2xl border-t-4 border-absherDark shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-gray-500 font-bold">إجمالي الطلبات</span>
+                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="folder" class="w-5 h-5 text-gray-400"></i>
+                            </div>
+                        </div>
+                        <p class="text-4xl font-extrabold text-absherDark" id="stat-total">0</p>
+                        <p class="text-gray-400 text-sm mt-2 font-medium">طلب مسجل</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl border-t-4 border-amber-500 shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-gray-500 font-bold">قيد المعالجة</span>
+                             <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="clock" class="w-5 h-5 text-amber-500"></i>
+                            </div>
+                        </div>
+                        <p class="text-4xl font-extrabold text-gray-800">0</p>
+                        <p class="text-gray-400 text-sm mt-2 font-medium">طلب جاري</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl border-t-4 border-green-500 shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-gray-500 font-bold">مكتملة</span>
+                             <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                            </div>
+                        </div>
+                        <p class="text-4xl font-extrabold text-gray-800">0</p>
+                        <p class="text-gray-400 text-sm mt-2 font-medium">طلب منجز</p>
+                    </div>
                 </div>
             </section>
 
-            <section id="view-new" class="hidden h-full animate-fade">
-                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 min-h-[600px] flex flex-col">
-                    <div class="px-8 py-6 border-b border-gray-100 bg-gray-50 rounded-t-3xl flex justify-between items-center">
-                        <h3 class="font-bold text-xl text-absherDark">إرسال طلب جديد</h3>
-                        <span class="text-sm bg-white px-3 py-1 rounded-full border border-gray-200">Ref: 2025-GOV</span>
+            <section id="view-new" class="hidden h-full animate-fade-in-up">
+                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 min-h-[700px] flex flex-col">
+                    <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 rounded-t-3xl flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-xl text-absherDark flex items-center gap-2">
+                                <i data-lucide="file-plus-2" class="w-6 h-6"></i>
+                                طلب نقل خدمات جديد
+                            </h3>
+                            <p class="text-gray-500 text-sm mt-1">يرجى تعبئة البيانات المطلوبة بدقة</p>
+                        </div>
+                        <span class="text-sm font-bold bg-white px-4 py-2 rounded-full border border-gray-200 text-absherDark flex items-center gap-2">
+                            <i data-lucide="qr-code" class="w-4 h-4"></i>
+                            REF: 2025-GOV
+                        </span>
                     </div>
 
                     <div class="py-10 px-20">
-                        <div class="relative flex justify-between max-w-3xl mx-auto mb-16">
-                            <div class="absolute top-1/2 w-full h-1 bg-gray-200 -z-10 -translate-y-1/2"></div>
-                            <div id="progress-bar" class="absolute top-1/2 h-1 bg-absherGreen -z-10 -translate-y-1/2 transition-all duration-500" style="width: 0%"></div>
-                            <div class="flex flex-col items-center gap-2 bg-white px-4" id="ind-1"><div class="step-circle active">1</div><span class="font-bold text-absherDark">السكن</span></div>
-                            <div class="flex flex-col items-center gap-2 bg-white px-4" id="ind-2"><div class="step-circle">2</div><span class="text-gray-400">الخدمات</span></div>
-                            <div class="flex flex-col items-center gap-2 bg-white px-4" id="ind-3"><div class="step-circle">3</div><span class="text-gray-400">تأكيد</span></div>
+                        <div class="relative flex justify-between max-w-3xl mx-auto mb-16 text-sm">
+                            <div class="absolute top-1/2 w-full h-1 bg-gray-100 -z-10 -translate-y-1/2 rounded-full"></div>
+                            <div id="progress-bar" class="absolute top-1/2 h-1 bg-absherGreen -z-10 -translate-y-1/2 transition-all duration-500 rounded-full" style="width: 0%"></div>
+                            
+                            <div class="flex flex-col items-center gap-3 bg-white px-4 z-10" id="ind-1">
+                                <div class="step-circle active">1</div>
+                                <span class="font-bold text-absherDark">بيانات السكن</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-3 bg-white px-4 z-10" id="ind-2">
+                                <div class="step-circle text-gray-400">2</div>
+                                <span class="text-gray-400 font-medium">اختيار الخدمات</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-3 bg-white px-4 z-10" id="ind-3">
+                                <div class="step-circle text-gray-400">3</div>
+                                <span class="text-gray-400 font-medium">مراجعة وتأكيد</span>
+                            </div>
                         </div>
 
                         <div class="max-w-4xl mx-auto min-h-[350px] flex flex-col justify-center">
                             
-                            <div id="step-1" class="space-y-10">
-                                <h3 class="text-2xl font-bold text-center text-gray-800">نوع العلاقة بالعقار</h3>
+                            <div id="step-1" class="space-y-10 animate-fade-in-up">
+                                <div class="text-center space-y-3">
+                                    <h3 class="text-2xl font-extrabold text-gray-800">نوع العلاقة بالعقار</h3>
+                                    <p class="text-gray-500 text-base font-medium">حدد صفتك في العقار الجديد للمتابعة</p>
+                                </div>
                                 <div class="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
-                                    <div onclick="selectHousing('ملكية')" id="card-owned" class="select-card p-10 rounded-3xl text-center flex flex-col items-center gap-4 shadow-sm">
-                                        <div class="w-20 h-20 bg-mojGold/10 rounded-full flex items-center justify-center text-mojGold"><i data-lucide="building-2" class="w-10 h-10"></i></div>
-                                        <span class="font-bold text-xl">مالك العقار</span>
-                                    </div>
-                                    <div onclick="selectHousing('إيجار')" id="card-rent" class="select-card p-10 rounded-3xl text-center flex flex-col items-center gap-4 shadow-sm">
-                                        <div class="w-20 h-20 bg-ejarCyan/10 rounded-full flex items-center justify-center text-ejarCyan"><i data-lucide="key" class="w-10 h-10"></i></div>
-                                        <span class="font-bold text-xl">مستأجر</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="step-verify-moj" class="hidden text-center space-y-8 w-full max-w-2xl mx-auto">
-                                <div class="bg-gradient-to-r from-mojGold to-yellow-600 text-white p-6 rounded-xl shadow-lg"><h4 class="text-xl font-bold">وزارة العدل</h4></div>
-                                <div id="moj-loading" class="py-10"><div class="spinner mx-auto mb-4 border-t-mojGold"></div><p>جاري التحقق...</p></div>
-                                <div id="moj-data" class="hidden bg-green-50 p-6 rounded-xl border border-green-200 text-green-800 font-bold">تم التحقق من الملكية بنجاح</div>
-                            </div>
-
-                            <div id="step-verify-ejar" class="hidden text-center space-y-8 w-full max-w-2xl mx-auto">
-                                <div class="bg-gradient-to-r from-ejarCyan to-teal-600 text-white p-6 rounded-xl shadow-lg"><h4 class="text-xl font-bold">شبكة إيجار</h4></div>
-                                <div id="ejar-loading" class="py-10"><div class="spinner mx-auto mb-4 border-t-ejarCyan"></div><p>جاري التحقق...</p></div>
-                                <div id="ejar-data" class="hidden bg-green-50 p-6 rounded-xl border border-green-200 text-green-800 font-bold">تم العثور على عقد إيجار ساري</div>
-                            </div>
-
-                            <div id="step-2" class="hidden space-y-10">
-                                <h3 class="text-2xl font-bold text-center text-gray-800">الخدمات المطلوب نقلها</h3>
-                                <div class="grid grid-cols-3 gap-6">
-                                    <div onclick="toggleService(this, 'الكهرباء')" class="select-card p-6 rounded-3xl h-48 flex flex-col justify-between shadow-sm relative group">
-                                        <div class="absolute top-4 left-4 checkbox-icon w-6 h-6 border-2 rounded-full"></div>
-                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i data-lucide="zap" class="w-6 h-6"></i></div>
-                                        <span class="font-bold text-lg">الكهرباء</span>
-                                    </div>
-                                    <div onclick="toggleService(this, 'المياه')" class="select-card p-6 rounded-3xl h-48 flex flex-col justify-between shadow-sm relative group">
-                                        <div class="absolute top-4 left-4 checkbox-icon w-6 h-6 border-2 rounded-full"></div>
-                                        <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600"><i data-lucide="droplets" class="w-6 h-6"></i></div>
-                                        <span class="font-bold text-lg">المياه</span>
-                                    </div>
-                                    <div onclick="toggleService(this, 'الاتصالات')" class="select-card p-6 rounded-3xl h-48 flex flex-col justify-between shadow-sm relative group">
-                                        <div class="absolute top-4 left-4 checkbox-icon w-6 h-6 border-2 rounded-full"></div>
-                                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"><i data-lucide="wifi" class="w-6 h-6"></i></div>
-                                        <span class="font-bold text-lg">الاتصالات</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="step-3" class="hidden text-center space-y-8 max-w-2xl mx-auto">
-                                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 mb-4">
-                                    <i data-lucide="file-check-2" class="w-10 h-10"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-gray-800">مراجعة وتأكيد الطلب</h3>
-                                
-                                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm text-right">
-                                    <div class="p-4 bg-gray-50 border-b border-gray-100 font-bold text-absherDark">ملخص البيانات</div>
-                                    <div class="p-6 space-y-6">
-                                        <div class="flex justify-between items-center border-b border-gray-100 pb-4">
-                                            <span class="text-gray-500 font-bold">نوع العقار:</span>
-                                            <span id="summary-type" class="font-bold text-xl text-absherDark">--</span>
+                                    <div onclick="selectHousing('ملكية')" id="card-owned" class="select-card p-10 rounded-3xl text-center flex flex-col items-center gap-6 shadow-sm">
+                                        <div class="w-24 h-24 bg-[#C6A87C]/10 rounded-full flex items-center justify-center text-[#C6A87C] border-2 border-[#C6A87C]/20">
+                                            <i data-lucide="building-2" class="w-12 h-12"></i>
                                         </div>
                                         <div>
-                                            <span class="text-gray-500 font-bold block mb-3">الخدمات المختارة:</span>
-                                            <div id="summary-services" class="flex gap-2 flex-wrap"></div>
+                                            <span class="font-bold text-xl block mb-2">مالك العقار</span>
+                                            <span class="text-xs text-[#C6A87C] bg-[#C6A87C]/10 px-3 py-1 rounded-full font-bold">تحقق عبر وزارة العدل</span>
                                         </div>
                                     </div>
+                                    <div onclick="selectHousing('إيجار')" id="card-rent" class="select-card p-10 rounded-3xl text-center flex flex-col items-center gap-6 shadow-sm">
+                                        <div class="w-24 h-24 bg-[#008C99]/10 rounded-full flex items-center justify-center text-[#008C99] border-2 border-[#008C99]/20">
+                                            <i data-lucide="key-round" class="w-12 h-12"></i>
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-xl block mb-2">مستأجر</span>
+                                            <span class="text-xs text-[#008C99] bg-[#008C99]/10 px-3 py-1 rounded-full font-bold">تحقق عبر شبكة إيجار</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="step-verify-moj" class="hidden text-center space-y-8 animate-fade-in-up w-full max-w-2xl mx-auto">
+                                <div class="bg-gradient-to-r from-[#5D4B3C] to-[#C6A87C] text-white p-8 rounded-2xl shadow-lg flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center">
+                                            <i data-lucide="landmark" class="w-8 h-8"></i>
+                                        </div>
+                                        <div class="text-right">
+                                            <h4 class="text-2xl font-bold">وزارة العدل</h4>
+                                            <p class="opacity-80 text-sm font-medium">بوابة التحقق العقاري</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="moj-loading" class="py-10">
+                                    <div class="spinner mx-auto mb-6 border-t-[#C6A87C]" style="border-right-color: #C6A87C;"></div>
+                                    <p class="font-bold text-xl text-gray-800 mb-2">جاري التحقق من الصك العقاري...</p>
+                                    <p class="text-gray-500">يرجى الانتظار لحظات</p>
+                                </div>
+                                <div id="moj-data" class="hidden bg-green-50 p-8 rounded-2xl border border-green-200 flex items-center gap-6">
+                                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                                         <i data-lucide="shield-check" class="w-8 h-8 text-green-600"></i>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-xl text-green-800 mb-1">تم التحقق من الملكية بنجاح</p>
+                                        <p class="text-green-600">البيانات مطابقة للسجلات الرسمية</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="step-verify-ejar" class="hidden text-center space-y-8 animate-fade-in-up w-full max-w-2xl mx-auto">
+                                <div class="bg-gradient-to-r from-[#008C99] to-[#0D9488] text-white p-8 rounded-2xl shadow-lg flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center">
+                                            <i data-lucide="building" class="w-8 h-8"></i>
+                                        </div>
+                                        <div class="text-right">
+                                            <h4 class="text-2xl font-bold">شبكة إيجار</h4>
+                                            <p class="opacity-80 text-sm font-medium">التحقق من العقد الإلكتروني</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="ejar-loading" class="py-10">
+                                    <div class="spinner mx-auto mb-6 border-t-[#008C99]" style="border-right-color: #008C99;"></div>
+                                    <p class="font-bold text-xl text-gray-800 mb-2">جاري البحث عن عقد نشط...</p>
+                                    <p class="text-gray-500">يرجى الانتظار لحظات</p>
+                                </div>
+                                <div id="ejar-data" class="hidden bg-green-50 p-8 rounded-2xl border border-green-200 flex items-center gap-6">
+                                     <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                                         <i data-lucide="file-check" class="w-8 h-8 text-green-600"></i>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-xl text-green-800 mb-1">تم العثور على عقد إيجار ساري</p>
+                                        <p class="text-green-600">العقد موثق ونشط في الشبكة</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="step-2" class="hidden space-y-10 animate-fade-in-up">
+                                <div class="text-center space-y-3">
+                                    <h3 class="text-2xl font-extrabold text-gray-800">الخدمات المطلوب نقلها</h3>
+                                    <p class="text-gray-500 text-base font-medium">اختر الخدمات التي ترغب في تفعيلها في عنوانك الجديد</p>
+                                </div>
+                                <div class="grid grid-cols-3 gap-8">
+                                    <div onclick="toggleService(this, 'الكهرباء')" class="select-card p-8 rounded-3xl relative h-64 flex flex-col justify-between shadow-sm overflow-hidden group">
+                                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full opacity-50 transition-transform group-hover:scale-110"></div>
+                                        <div class="relative z-10 flex justify-between">
+                                            <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
+                                                <i data-lucide="zap" class="w-7 h-7"></i>
+                                            </div>
+                                            <div class="checkbox-icon w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-white transition-all"></div>
+                                        </div>
+                                        <div class="relative z-10">
+                                            <h4 class="font-bold text-xl text-gray-800 mb-1">الكهرباء</h4>
+                                            <p class="text-sm text-gray-500 font-bold">الشركة السعودية للكهرباء</p>
+                                        </div>
+                                    </div>
+                                    <div onclick="toggleService(this, 'المياه')" class="select-card p-8 rounded-3xl relative h-64 flex flex-col justify-between shadow-sm overflow-hidden group">
+                                        <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-50 rounded-bl-full opacity-50 transition-transform group-hover:scale-110"></div>
+                                        <div class="relative z-10 flex justify-between">
+                                            <div class="w-14 h-14 bg-cyan-100 rounded-2xl flex items-center justify-center text-cyan-600">
+                                                <i data-lucide="droplets" class="w-7 h-7"></i>
+                                            </div>
+                                            <div class="checkbox-icon w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-white transition-all"></div>
+                                        </div>
+                                        <div class="relative z-10">
+                                            <h4 class="font-bold text-xl text-gray-800 mb-1">المياه</h4>
+                                            <p class="text-sm text-gray-500 font-bold">شركة المياه الوطنية</p>
+                                        </div>
+                                    </div>
+                                    <div onclick="toggleService(this, 'الاتصالات')" class="select-card p-8 rounded-3xl relative h-64 flex flex-col justify-between shadow-sm overflow-hidden group">
+                                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-full opacity-50 transition-transform group-hover:scale-110"></div>
+                                        <div class="relative z-10 flex justify-between">
+                                            <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600">
+                                                <i data-lucide="wifi" class="w-7 h-7"></i>
+                                            </div>
+                                            <div class="checkbox-icon w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-white transition-all"></div>
+                                        </div>
+                                        <div class="relative z-10">
+                                            <h4 class="font-bold text-xl text-gray-800 mb-1">الاتصالات</h4>
+                                            <p class="text-sm text-gray-500 font-bold">شركات الاتصالات المعتمدة</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="step-3" class="hidden text-center space-y-8 animate-fade-in-up max-w-2xl mx-auto">
+                                <div class="w-20 h-20 bg-absherAccent/10 rounded-full flex items-center justify-center mx-auto text-absherAccent border-4 border-white shadow-lg">
+                                    <i data-lucide="file-check-2" class="w-10 h-10"></i>
+                                </div>
+                                <div class="space-y-2">
+                                    <h3 class="text-2xl font-extrabold text-gray-800">مراجعة وتأكيد الطلب</h3>
+                                    <p class="text-gray-600 font-medium">يرجى التحقق من صحة البيانات قبل الاعتماد النهائي</p>
+                                </div>
+                                
+                                <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm text-right">
+                                    <div class="p-6 bg-gray-50 border-b border-gray-100 flex items-center gap-3">
+                                        <i data-lucide="list-checks" class="w-6 h-6 text-absherDark"></i>
+                                        <h4 class="font-bold text-lg text-absherDark">ملخص الطلب</h4>
+                                    </div>
+                                    <div class="p-8 space-y-6">
+                                        <div class="flex justify-between items-center pb-4 border-b border-gray-50">
+                                            <span class="text-gray-500 font-bold flex items-center gap-2"><i data-lucide="home" class="w-4 h-4"></i> نوع العقار:</span>
+                                            <span id="summary-type" class="font-extrabold text-lg text-absherDark">--</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-500 font-bold block mb-3 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> الخدمات المختارة:</span>
+                                            <div id="summary-services" class="flex gap-3 flex-wrap"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 flex items-start gap-3 text-sm text-amber-800 font-medium text-right">
+                                    <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5 text-amber-600"></i>
+                                    <p>بإرسال هذا الطلب، أنت تقر بصحة البيانات المدخلة وتوافق على الشروط والأحكام.</p>
                                 </div>
                             </div>
 
                         </div>
                     </div>
 
-                    <div class="p-8 bg-white border-t border-gray-100 flex justify-between items-center rounded-b-3xl">
-                        <button onclick="prevStep()" id="btn-back" class="hidden text-gray-500 font-bold px-6 py-3">السابق</button>
-                        <button onclick="nextStep()" id="btn-next" class="bg-absherDark hover:bg-absherGreen text-white px-10 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2"><span>التالي</span> <i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                    <div class="p-8 bg-white border-t border-gray-100 flex justify-between items-center rounded-b-3xl relative z-20">
+                        <button onclick="prevStep()" id="btn-back" class="hidden text-gray-500 hover:text-absherDark font-bold px-6 py-3 transition flex items-center gap-3 rounded-xl hover:bg-gray-50">
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i> السابق
+                        </button>
+                        <div class="flex-1"></div>
+                        <button onclick="nextStep()" id="btn-next" class="bg-absherDark hover:bg-absherGreen text-white px-10 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-3 text-lg group">
+                            <span>المتابعة للتالي</span> <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
+                        </button>
                     </div>
                 </div>
             </section>
 
-            <section id="view-track" class="hidden h-full animate-fade">
+            <section id="view-track" class="hidden h-full animate-fade-in-up">
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="px-10 py-8 border-b border-gray-100 bg-gray-50"><h3 class="font-bold text-2xl text-absherDark">سجل طلباتي</h3></div>
-                    <div class="overflow-x-auto p-4">
-                        <table class="w-full text-right"><thead class="bg-gray-50"><tr><th class="p-4">رقم الطلب</th><th class="p-4">العقار</th><th class="p-4">الخدمات</th><th class="p-4">التاريخ</th><th class="p-4">الحالة</th></tr></thead><tbody id="table-body"></tbody></table>
+                    <div class="px-10 py-8 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-2xl text-absherDark mb-2">سجل طلباتي</h3>
+                            <p class="text-gray-500 font-medium">تتبع حالة طلبات نقل الخدمات الخاصة بك</p>
+                        </div>
                     </div>
-                    <div id="empty-state" class="hidden p-20 text-center text-gray-400"><i data-lucide="inbox" class="w-12 h-12 mx-auto mb-2 opacity-50"></i><p>لا توجد طلبات</p></div>
+                    <div class="overflow-x-auto p-4">
+                        <table class="w-full text-right border-collapse">
+                            <thead class="bg-absherDark/5 text-absherDark text-sm rounded-xl">
+                                <tr>
+                                    <th class="p-6 font-extrabold rounded-r-xl">رقم الطلب</th>
+                                    <th class="p-6 font-extrabold">نوع العقار</th>
+                                    <th class="p-6 font-extrabold">الخدمات المطلوبة</th>
+                                    <th class="p-6 font-extrabold">تاريخ التقديم</th>
+                                    <th class="p-6 font-extrabold rounded-l-xl">الحالة الحالية</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-gray-50"></tbody>
+                        </table>
+                    </div>
+                    <div id="empty-state" class="hidden p-20 text-center text-gray-400 flex flex-col items-center justify-center">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                            <i data-lucide="inbox" class="w-12 h-12 opacity-50 text-gray-400"></i>
+                        </div>
+                        <p class="text-xl font-bold text-gray-600 mb-2">لا توجد طلبات سابقة</p>
+                        <p class="text-gray-400 mb-6">ابدأ بإنشاء طلب جديد لنقل خدماتك</p>
+                        <button onclick="nav('new')" class="bg-absherAccent/10 text-absherDark border border-absherAccent/30 px-6 py-3 rounded-xl font-bold hover:bg-absherAccent/20 transition flex items-center gap-2">
+                            <i data-lucide="plus" class="w-5 h-5"></i> إنشاء طلب جديد
+                        </button>
+                    </div>
                 </div>
             </section>
 
         </div>
     </main>
+
     <script src="app.js"></script>
 </body>
 </html>

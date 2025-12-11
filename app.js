@@ -34,18 +34,16 @@ function nav(page) {
 
 // --- دوال مساعدة لإدارة الأخطاء (Red Borders) ---
 
-// إظهار الخطأ (إطار أحمر)
+// إظهار الخطأ (إطار أحمر مع حركة اهتزاز)
 function showError(stepId) {
     const cards = document.querySelectorAll(`#${stepId} .select-card`);
     cards.forEach(card => {
-        card.classList.add('border-red-500', 'ring-1', 'ring-red-500', 'bg-red-50');
-        // حركة اهتزاز بسيطة لجذب الانتباه
-        card.animate([
-            { transform: 'translateX(0)' },
-            { transform: 'translateX(-5px)' },
-            { transform: 'translateX(5px)' },
-            { transform: 'translateX(0)' }
-        ], { duration: 300 });
+        card.classList.add('border-red-500', 'ring-1', 'ring-red-500', 'bg-red-50', 'shake');
+
+        // إزالة حركة الاهتزاز بعد انتهائها
+        setTimeout(() => {
+            card.classList.remove('shake');
+        }, 300);
     });
 }
 
@@ -60,23 +58,23 @@ function clearError(stepId) {
 // --- منطق النموذج (Wizard) ---
 
 function selectHousing(type) {
-    // 1. إزالة أي خطأ سابق بمجرد الاختيار
+    // إزالة أي خطأ سابق بمجرد الاختيار
     clearError('step-1');
-    
+
     formData.housingType = type;
     document.querySelectorAll('#step-1 .select-card').forEach(el => el.classList.remove('selected'));
-    
+
     if(type === 'ملكية') document.getElementById('card-owned').classList.add('selected');
     if(type === 'إيجار') document.getElementById('card-rent').classList.add('selected');
 }
 
 function toggleService(card, name) {
-    // 1. إزالة الخطأ بمجرد التفاعل
+    // إزالة الخطأ بمجرد التفاعل
     clearError('step-2');
 
     card.classList.toggle('selected');
     const box = card.querySelector('.checkbox-icon');
-    
+
     if(formData.services.includes(name)) {
         formData.services = formData.services.filter(s => s !== name);
         box.innerHTML = '';
@@ -89,12 +87,12 @@ function toggleService(card, name) {
     }
 }
 
-// زر التالي (مع التحقق الجديد)
+// زر التالي (مع التحقق الذكي)
 function nextStep() {
-    // 1. التحقق من الخطوة الأولى
+    // التحقق من الخطوة الأولى
     if(currentStep === 1) {
         if(!formData.housingType) {
-            showError('step-1'); // تلوين الخيارات بالأحمر بدلاً من الـ Alert
+            showError('step-1');
             return;
         }
         if(formData.housingType === 'ملكية') {
@@ -110,11 +108,11 @@ function nextStep() {
         updateWizardUI();
         return;
     }
-    
-    // 2. التحقق من الخطوة الثانية
+
+    // التحقق من الخطوة الثانية
     if(currentStep === 2) {
         if(formData.services.length === 0) {
-            showError('step-2'); // تلوين الخيارات بالأحمر
+            showError('step-2');
             return;
         }
         currentStep = 3;
@@ -135,7 +133,7 @@ function prevStep() {
         return;
     }
     if(currentStep === 2) {
-        currentStep = 1; 
+        currentStep = 1;
         updateWizardUI();
         return;
     }
@@ -186,7 +184,7 @@ function simulateLoading(type) {
         badge.innerText = 'جاري الاتصال...';
         badge.classList.remove('bg-green-500', 'text-white');
     }
-    
+
     nextBtn.disabled = true;
     nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
@@ -214,7 +212,7 @@ function updateWizardUI() {
         const ind = document.getElementById(`ind-${i}`);
         const circle = ind.querySelector('.step-circle');
         const text = ind.querySelector('span');
-        
+
         let isActive = false;
         if(i === 1) isActive = true;
         if(i === 2 && (currentStep === 2 || currentStep === 3)) isActive = true;
@@ -236,12 +234,12 @@ function updateWizardUI() {
     const backBtn = document.getElementById('btn-back');
     if(currentStep === 1) backBtn.classList.add('hidden');
     else backBtn.classList.remove('hidden');
-    
+
     const nextBtn = document.getElementById('btn-next');
     if(currentStep === 3) {
         nextBtn.innerHTML = 'إرسال الطلب <i data-lucide="send" class="w-4 h-4"></i>';
         document.getElementById('summary-type').innerText = formData.housingType;
-        document.getElementById('summary-services').innerHTML = formData.services.map(s => 
+        document.getElementById('summary-services').innerHTML = formData.services.map(s =>
             `<span class="bg-emerald-50 text-absherGreen border border-emerald-100 px-2 py-1 rounded text-xs font-bold">${s}</span>`
         ).join('');
     } else {
@@ -288,7 +286,7 @@ function submitForm() {
 
     setTimeout(() => {
         let requests = JSON.parse(localStorage.getItem('mersalRequests')) || [];
-        
+
         const newRequest = {
             id: Math.floor(Math.random() * 9000) + 1000,
             housingType: formData.housingType,
@@ -300,7 +298,7 @@ function submitForm() {
         requests.unshift(newRequest);
         localStorage.setItem('mersalRequests', JSON.stringify(requests));
 
-        // أبقينا التنبيه الجميل فقط عند النجاح
+        // تنبيه النجاح الاحترافي
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'تم إرسال الطلب بنجاح',
@@ -315,7 +313,6 @@ function submitForm() {
                 }
             });
         } else {
-            alert('✅ تم إرسال الطلب بنجاح');
             btn.disabled = false;
             nav('track');
         }
@@ -340,8 +337,8 @@ function loadRequests() {
                 <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                     <td class="p-6 font-bold text-gray-700">#${req.id}</td>
                     <td class="p-6 font-bold text-gray-800">
-                        ${req.housingType} 
-                        <span class="text-xs text-gray-400 mx-2">|</span> 
+                        ${req.housingType}
+                        <span class="text-xs text-gray-400 mx-2">|</span>
                         <span class="text-absherGreen text-xs">${req.services.join('، ')}</span>
                     </td>
                     <td class="p-6 text-sm text-gray-500">${req.date}</td>

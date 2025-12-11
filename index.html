@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة مرسال | الخدمات الإلكترونية</title>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
@@ -36,7 +36,22 @@
     </script>
 
     <style>
-        body { background-color: #F8F9FA; }
+        /* خلفية بنقشة رسمية خفيفة */
+        body { 
+            background-color: #F8F9FA;
+            background-image: radial-gradient(#004d38 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+            background-position: 0 0;
+        }
+        /* تخفيف حدة النقشة لتكون مريحة */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(248, 249, 250, 0.96); /* طبقة شفافة فوق النقشة */
+            z-index: -1;
+        }
+
         .step-circle {
             width: 32px; height: 32px; border-radius: 50%;
             border: 2px solid #E5E7EB; display: flex;
@@ -44,12 +59,13 @@
             background: white; z-index: 10; font-weight: bold; font-size: 14px;
             transition: all 0.3s ease;
         }
+        
         .select-card {
             transition: all 0.2s ease-in-out; cursor: pointer;
             border: 1px solid #E5E7EB;
         }
-        .select-card:hover {
-            border-color: #006B4D;
+        .select-card:hover { 
+            border-color: #006B4D; 
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
         }
@@ -60,52 +76,44 @@
         .select-card.selected .checkbox-icon {
             background-color: #006B4D; border-color: #006B4D;
         }
+        
         .glass-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
         }
+
         .nav-item { transition: all 0.2s; border-right: 4px solid transparent; }
         .nav-item:hover { background-color: rgba(255,255,255,0.05); }
-        .nav-item.active {
+        .nav-item.active { 
             background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 100%);
-            border-right-color: #fff;
+            border-right-color: #fff; 
             font-weight: bold;
         }
+
         .animate-fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* ستايل التحميل (Spinner) */
         .spinner {
             border: 3px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
             border-top-color: currentColor;
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .pulse-slow {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        .pulse-slow { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         .integration-card {
-            background: white;
-            border-radius: 16px;
+            background: white; border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
         }
-
         .data-item {
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 8px;
-            border-right: 3px solid;
+            padding: 16px; background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px; border-right: 3px solid;
         }
     </style>
 </head>
@@ -115,7 +123,7 @@
         <div class="h-24 flex items-center justify-center border-b border-white/10 p-4">
              <h1 class="text-2xl font-extrabold tracking-wide">مرسال</h1>
         </div>
-
+        
         <nav class="flex-1 py-6 space-y-1">
             <button onclick="nav('home')" id="btn-home" class="nav-item active w-full flex items-center gap-4 px-6 py-4 text-right">
                 <i data-lucide="layout-grid" class="w-5 h-5 opacity-90"></i>
@@ -123,8 +131,7 @@
             </button>
             <button onclick="nav('new')" id="btn-new" class="nav-item w-full flex items-center gap-4 px-6 py-4 text-right text-gray-100">
                 <i data-lucide="file-text" class="w-5 h-5 opacity-90"></i>
-                <span class="text-base">خدماتي</span>
-            </button>
+                <span class="text-base">نقل الخدمات</span> </button>
             <button onclick="nav('track')" id="btn-track" class="nav-item w-full flex items-center gap-4 px-6 py-4 text-right text-gray-100">
                 <i data-lucide="history" class="w-5 h-5 opacity-90"></i>
                 <span class="text-base">سجل الطلبات</span>
@@ -144,8 +151,8 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen relative bg-[#F8F9FA]">
-
+    <main class="flex-1 flex flex-col h-screen relative">
+        
         <header class="h-16 glass-header border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-20">
             <h2 id="page-title" class="text-lg font-bold text-absherDark flex items-center gap-2">
                 <span class="w-1.5 h-6 bg-absherGreen rounded-full block"></span>
@@ -164,7 +171,7 @@
         </header>
 
         <div class="p-8 overflow-y-auto flex-1">
-
+            
             <section id="view-home" class="space-y-6 animate-fade-in">
                 <div class="bg-gradient-to-l from-absherDark to-absherGreen rounded-xl p-8 text-white relative overflow-hidden shadow-lg">
                     <div class="relative z-10">
@@ -186,7 +193,7 @@
                         <p class="text-gray-500 text-sm">إجمالي الطلبات</p>
                         <p class="text-3xl font-bold text-gray-800 mt-1" id="stat-total">0</p>
                     </div>
-
+                    
                     <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-card hover:shadow-card-hover transition-all group">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600 group-hover:scale-110 transition">
@@ -211,7 +218,7 @@
 
             <section id="view-new" class="hidden h-full">
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm min-h-[600px] flex flex-col">
-
+                    
                     <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-xl">
                         <h3 class="font-bold text-lg text-absherDark">إرسال طلب جديد</h3>
                         <span class="text-xs text-gray-400 bg-white px-3 py-1 rounded-full border">رقم الخدمة: 2055</span>
@@ -221,7 +228,7 @@
                         <div class="flex items-center justify-between relative max-w-3xl mx-auto">
                             <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-100 -z-0 -translate-y-1/2 rounded-full"></div>
                             <div id="progress-bar" class="absolute top-1/2 right-0 h-1 bg-absherGreen -z-0 -translate-y-1/2 rounded-full transition-all duration-500" style="width: 0%;"></div>
-
+                            
                             <div class="flex flex-col items-center gap-3 bg-white px-2 z-10" id="ind-1">
                                 <div class="step-circle bg-absherGreen border-absherGreen text-white shadow-lg shadow-green-100">1</div>
                                 <span class="text-sm font-bold text-absherDark">بيانات السكن</span>
@@ -238,8 +245,7 @@
                     </div>
 
                     <div class="flex-1 px-20 pb-12 flex flex-col justify-center items-center bg-white">
-
-                        <!-- Step 1: Housing Selection -->
+                        
                         <div id="step-1" class="w-full max-w-lg space-y-8 animate-fade-in">
                             <div class="text-center">
                                 <h3 class="text-xl font-bold text-gray-800 mb-2">نوع العقار</h3>
@@ -257,7 +263,6 @@
                             </div>
                         </div>
 
-                        <!-- Ministry of Justice Verification -->
                         <div id="step-verify-moj" class="hidden w-full max-w-2xl space-y-8 animate-fade-in">
                             <div class="text-center mb-8">
                                 <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-full mb-4">
@@ -281,9 +286,7 @@
                                             </div>
                                         </div>
                                         <div class="text-left">
-                                            <div id="moj-status-badge" class="bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">
-                                                جاري الاتصال...
-                                            </div>
+                                            <div id="moj-status-badge" class="bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">جاري الاتصال...</div>
                                         </div>
                                     </div>
                                 </div>
@@ -299,45 +302,18 @@
                                         <i data-lucide="check-circle" class="w-5 h-5"></i>
                                         <span class="font-bold">تم التحقق من البيانات بنجاح</span>
                                     </div>
-
                                     <div class="space-y-3">
                                         <div class="data-item border-r-mojGold">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">رقم الصك</span>
-                                                <span class="font-bold text-gray-800" dir="ltr">430105032844</span>
-                                            </div>
+                                            <div class="flex justify-between items-center"><span class="text-sm text-gray-500">رقم الصك</span><span class="font-bold text-gray-800" dir="ltr">430105032844</span></div>
                                         </div>
                                         <div class="data-item border-r-mojGold">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">الحي</span>
-                                                <span class="font-bold text-gray-800">حي النخيل</span>
-                                            </div>
-                                        </div>
-                                        <div class="data-item border-r-mojGold">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">المساحة</span>
-                                                <span class="font-bold text-gray-800">450 متر مربع</span>
-                                            </div>
-                                        </div>
-                                        <div class="data-item border-r-mojGold">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">تاريخ الصك</span>
-                                                <span class="font-bold text-gray-800">1445/03/12 هـ</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                                        <div class="flex gap-2 text-amber-800 text-sm">
-                                            <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
-                                            <p>تم استرجاع البيانات من قاعدة بيانات وزارة العدل بشكل آمن ومشفر</p>
+                                            <div class="flex justify-between items-center"><span class="text-sm text-gray-500">الحي</span><span class="font-bold text-gray-800">حي النخيل</span></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Ejar Verification -->
                         <div id="step-verify-ejar" class="hidden w-full max-w-2xl space-y-8 animate-fade-in">
                             <div class="text-center mb-8">
                                 <div class="inline-flex items-center gap-2 bg-teal-50 border border-teal-200 px-4 py-2 rounded-full mb-4">
@@ -361,9 +337,7 @@
                                             </div>
                                         </div>
                                         <div class="text-left">
-                                            <div id="ejar-status-badge" class="bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">
-                                                جاري الاتصال...
-                                            </div>
+                                            <div id="ejar-status-badge" class="bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">جاري الاتصال...</div>
                                         </div>
                                     </div>
                                 </div>
@@ -379,45 +353,15 @@
                                         <i data-lucide="check-circle" class="w-5 h-5"></i>
                                         <span class="font-bold">تم التحقق من البيانات بنجاح</span>
                                     </div>
-
                                     <div class="space-y-3">
                                         <div class="data-item border-r-ejarGreen">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">رقم العقد</span>
-                                                <span class="font-bold text-gray-800" dir="ltr">EJR-2024-589612</span>
-                                            </div>
-                                        </div>
-                                        <div class="data-item border-r-ejarGreen">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">تاريخ البداية</span>
-                                                <span class="font-bold text-gray-800">1445/01/15 هـ</span>
-                                            </div>
-                                        </div>
-                                        <div class="data-item border-r-ejarGreen">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">مدة العقد</span>
-                                                <span class="font-bold text-gray-800">سنة واحدة</span>
-                                            </div>
-                                        </div>
-                                        <div class="data-item border-r-ejarGreen">
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-sm text-gray-500">القيمة الإيجارية السنوية</span>
-                                                <span class="font-bold text-gray-800">48,000 ريال</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-6 p-4 bg-teal-50 border border-teal-200 rounded-lg">
-                                        <div class="flex gap-2 text-teal-800 text-sm">
-                                            <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
-                                            <p>تم استرجاع البيانات من شبكة إيجار الموحدة بشكل آمن ومشفر</p>
+                                            <div class="flex justify-between items-center"><span class="text-sm text-gray-500">رقم العقد</span><span class="font-bold text-gray-800" dir="ltr">EJR-2024-589612</span></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Step 2: Services Selection -->
                         <div id="step-2" class="hidden w-full max-w-4xl space-y-8 animate-fade-in">
                             <div class="text-center">
                                 <h3 class="text-xl font-bold text-gray-800 mb-2">الخدمات المرتبطة</h3>
@@ -457,14 +401,13 @@
                             </div>
                         </div>
 
-                        <!-- Step 3: Review -->
                         <div id="step-3" class="hidden w-full max-w-lg space-y-6 animate-fade-in text-center">
                             <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto text-green-600 mb-4">
                                 <i data-lucide="clipboard-check" class="w-8 h-8"></i>
                             </div>
                             <h3 class="text-2xl font-bold text-gray-800">مراجعة الطلب</h3>
                             <p class="text-gray-500">يرجى التأكد من البيانات قبل الإرسال النهائي</p>
-
+                            
                             <div class="bg-gray-50 rounded-xl p-6 text-right border border-gray-200 mt-6 space-y-4">
                                 <div class="flex justify-between border-b border-gray-200 pb-3">
                                     <span class="text-gray-500">نوع العقار:</span>
@@ -472,8 +415,7 @@
                                 </div>
                                 <div>
                                     <span class="text-gray-500 block mb-2">الخدمات المختارة:</span>
-                                    <div id="summary-services" class="flex flex-wrap gap-2">
-                                        </div>
+                                    <div id="summary-services" class="flex flex-wrap gap-2"></div>
                                 </div>
                             </div>
                         </div>
@@ -508,8 +450,7 @@
                                     <th class="p-6 font-medium">الحالة</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-body" class="divide-y divide-gray-100">
-                                </tbody>
+                            <tbody id="table-body" class="divide-y divide-gray-100"></tbody>
                         </table>
                         <div id="empty-state" class="hidden p-12 text-center text-gray-400">
                             <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
@@ -521,7 +462,6 @@
 
         </div>
     </main>
-
 
     <script src="app.js"></script>
 </body>
